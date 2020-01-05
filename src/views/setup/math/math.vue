@@ -5,8 +5,7 @@
             <div slot="header" class="clearfix">
                 <span>用户管理</span>
             </div>
-            <el-button type="primary" icon="el-icon-circle-plus-outline" @click="dialogFormVisible = true" class="aaa"
-                       size="small">添加用户
+            <el-button type="primary" icon="el-icon-circle-plus-outline" @click="dialogFormVisible = true" class="aaa" size="small">添加用户
             </el-button>
             <!--表格-->
             <el-table
@@ -34,28 +33,34 @@
                         label="所在小区">
                 </el-table-column>
                 <el-table-column
-                        prop="name"
+                        prop="user_name"
                         label="姓名">
                 </el-table-column>
                 <el-table-column
-                        prop="name"
+                        prop="mobile"
                         label="电话">
                 </el-table-column>
                 <el-table-column
-                        prop="name"
+                        prop="card_number"
                         label="身份证号">
                 </el-table-column>
                 <el-table-column
-                        prop="name"
+                        prop="age"
                         label="年龄">
                 </el-table-column>
                 <el-table-column
-                        prop="name"
+                        prop="sex"
                         label="性别">
+                    <template slot-scope="scope">
+                        <span>{{scope.row.sex === 0?"男":"女"}}</span>
+                    </template>
                 </el-table-column>
                 <el-table-column
-                        prop="name"
-                        label="老人类别">
+                        prop="type"
+                        label="用户类型">
+                    <template slot-scope="scope">
+                        <span>{{scope.row.type === 0?"普通":scope.row.type === 1?"高龄":scope.row.type === 2?"残疾":"困难"}}</span>
+                    </template>
                 </el-table-column>
                 <el-table-column
                         fixed="right"
@@ -91,7 +96,8 @@
         <el-dialog title="添加用户" :visible.sync="dialogFormVisible">
             <el-form label-width="100px" :model="formLabelAlign">
                 <el-form-item label="所在街道">
-                    <el-select v-model="formLabelAlign.street_id" placeholder="请选择">
+                    <el-select v-model="formLabelAlign.street_id" placeholder="请选择"
+                               @change="streetChange(formLabelAlign.street_id)">
                         <el-option
                                 v-for="item in options"
                                 :key="item.id"
@@ -101,7 +107,8 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所在居委会">
-                    <el-select v-model="formLabelAlign.nbc_id" placeholder="请选择">
+                    <el-select v-model="formLabelAlign.nbc_id" placeholder="请选择"
+                               @change="nbcChange(formLabelAlign.nbc_id)">
                         <el-option
                                 v-for="item in optionsNbc"
                                 :key="item.id"
@@ -120,29 +127,47 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item label="老人类别">
+                    <el-select v-model="formLabelAlign.type" placeholder="请选择">
+                        <el-option
+                                v-for="item in optionsType"
+                                :key="item.id"
+                                :label="item.type_name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="姓名">
-                    <el-input v-model="formLabelAlign.region"></el-input>
+                    <el-input v-model="formLabelAlign.user_name"></el-input>
                 </el-form-item>
                 <el-form-item label="身份证号">
-                    <el-input v-model="formLabelAlign.region"></el-input>
+                    <el-input v-model="formLabelAlign.card_number"></el-input>
                 </el-form-item>
                 <el-form-item label="年龄">
-                    <el-input v-model="formLabelAlign.region"></el-input>
+                    <el-input v-model="formLabelAlign.age"></el-input>
                 </el-form-item>
                 <el-form-item label="性别">
-                    <el-input v-model="formLabelAlign.region"></el-input>
+                    <el-select v-model="formLabelAlign.sex" placeholder="请选择">
+                        <el-option
+                                v-for="item in optionsSex"
+                                :key="item.id"
+                                :label="item.sex_name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="电话">
-                    <el-input v-model="formLabelAlign.region"></el-input>
+                    <el-input v-model="formLabelAlign.mobile"></el-input>
                 </el-form-item>
-                <el-form-item label="老人类别">
-                    <el-input v-model="formLabelAlign.region"></el-input>
-                </el-form-item>
+
                 <el-form-item label="户籍住址">
-                    <el-input v-model="formLabelAlign.region"></el-input>
+                    <el-input v-model="formLabelAlign.address"></el-input>
+                </el-form-item>
+                <el-form-item label="现住址">
+                    <el-input v-model="formLabelAlign.now_address"></el-input>
                 </el-form-item>
                 <el-form-item label="银行卡号">
-                    <el-input placeholder="社保卡" v-model="formLabelAlignDetails.region"></el-input>
+                    <el-input placeholder="社保卡" v-model="formLabelAlign.bank_card"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -154,7 +179,8 @@
         <el-dialog title="编辑用户" :visible.sync="dialogFormVisibleEdit">
             <el-form label-width="100px" :model="formLabelAlignEdit">
                 <el-form-item label="所在街道">
-                    <el-select v-model="formLabelAlignEdit.street_id" placeholder="请选择">
+                    <el-select v-model="formLabelAlignEdit.street_id" placeholder="请选择"
+                               @change="streetChange(formLabelAlignEdit.street_id)">
                         <el-option
                                 v-for="item in options"
                                 :key="item.id"
@@ -164,7 +190,8 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所在居委会">
-                    <el-select v-model="formLabelAlignEdit.nbc_id" placeholder="请选择">
+                    <el-select v-model="formLabelAlignEdit.nbc_id" placeholder="请选择"
+                               @change="nbcChange(formLabelAlignEdit.nbc_id)">
                         <el-option
                                 v-for="item in optionsNbc"
                                 :key="item.id"
@@ -183,29 +210,46 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item label="老人类别">
+                    <el-select v-model="formLabelAlignEdit.type" placeholder="请选择">
+                        <el-option
+                                v-for="item in optionsType"
+                                :key="item.id"
+                                :label="item.type_name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="姓名">
-                    <el-input v-model="formLabelAlignEdit.region"></el-input>
+                    <el-input v-model="formLabelAlignEdit.user_name"></el-input>
                 </el-form-item>
                 <el-form-item label="身份证号">
-                    <el-input v-model="formLabelAlignEdit.region"></el-input>
+                    <el-input v-model="formLabelAlignEdit.card_number"></el-input>
                 </el-form-item>
                 <el-form-item label="年龄">
-                    <el-input v-model="formLabelAlignEdit.region"></el-input>
+                    <el-input v-model="formLabelAlignEdit.age"></el-input>
                 </el-form-item>
                 <el-form-item label="性别">
-                    <el-input v-model="formLabelAlignEdit.region"></el-input>
+                    <el-select v-model="formLabelAlignEdit.sex" placeholder="请选择">
+                        <el-option
+                                v-for="item in optionsSex"
+                                :key="item.id"
+                                :label="item.sex_name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="电话">
-                    <el-input v-model="formLabelAlignEdit.region"></el-input>
-                </el-form-item>
-                <el-form-item label="老人类别">
-                    <el-input v-model="formLabelAlignEdit.region"></el-input>
+                    <el-input v-model="formLabelAlignEdit.mobile"></el-input>
                 </el-form-item>
                 <el-form-item label="户籍住址">
-                    <el-input v-model="formLabelAlignEdit.region"></el-input>
+                    <el-input v-model="formLabelAlignEdit.address"></el-input>
+                </el-form-item>
+                <el-form-item label="现住址">
+                    <el-input v-model="formLabelAlignEdit.now_address"></el-input>
                 </el-form-item>
                 <el-form-item label="银行卡号">
-                    <el-input placeholder="社保卡" v-model="formLabelAlignDetails.region"></el-input>
+                    <el-input placeholder="社保卡" v-model="formLabelAlignEdit.bank_card"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -217,58 +261,70 @@
         <el-dialog title="查看用户" :visible.sync="dialogFormVisibleDetails">
             <el-form :disabled="true" label-width="100px" :model="formLabelAlignDetails">
                 <el-form-item label="所在街道">
-                    <el-select v-model="formLabelAlignDetails.name" placeholder="请选择">
+                    <el-select v-model="formLabelAlignDetails.street_id" placeholder="请选择"
+                               @change="streetChange(formLabelAlignDetails.street_id)">
                         <el-option
                                 v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
+                                :key="item.id"
+                                :label="item.street_name"
+                                :value="item.id">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所在居委会">
-                    <el-select v-model="formLabelAlignDetails.name" placeholder="请选择">
+                    <el-select v-model="formLabelAlignDetails.nbc_id" placeholder="请选择"
+                               @change="nbcChange(formLabelAlignDetails.nbc_id)">
                         <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
+                                v-for="item in optionsNbc"
+                                :key="item.id"
+                                :label="item.nbc_name"
+                                :value="item.id">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所在小区">
-                    <el-select v-model="formLabelAlignDetails.name" placeholder="请选择">
+                    <el-select v-model="formLabelAlignDetails.village_id" placeholder="请选择">
                         <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
+                                v-for="item in optionsVill"
+                                :key="item.id"
+                                :label="item.village_name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="老人类别">
+                    <el-select v-model="formLabelAlignDetails.type" placeholder="请选择">
+                        <el-option
+                                v-for="item in optionsType"
+                                :key="item.id"
+                                :label="item.type_name"
+                                :value="item.id">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="姓名">
-                    <el-input v-model="formLabelAlignDetails.region"></el-input>
+                    <el-input v-model="formLabelAlignDetails.user_name"></el-input>
                 </el-form-item>
                 <el-form-item label="身份证号">
-                    <el-input v-model="formLabelAlignDetails.region"></el-input>
+                    <el-input v-model="formLabelAlignDetails.card_number"></el-input>
                 </el-form-item>
                 <el-form-item label="年龄">
-                    <el-input v-model="formLabelAlignDetails.region"></el-input>
+                    <el-input v-model="formLabelAlignDetails.age"></el-input>
                 </el-form-item>
                 <el-form-item label="性别">
-                    <el-input v-model="formLabelAlignDetails.region"></el-input>
+                    <el-input v-model="formLabelAlignDetails.sex"></el-input>
                 </el-form-item>
                 <el-form-item label="电话">
-                    <el-input v-model="formLabelAlignDetails.region"></el-input>
-                </el-form-item>
-                <el-form-item label="老人类别">
-                    <el-input v-model="formLabelAlignDetails.region"></el-input>
+                    <el-input v-model="formLabelAlignDetails.mobile"></el-input>
                 </el-form-item>
                 <el-form-item label="户籍住址">
-                    <el-input v-model="formLabelAlignDetails.region"></el-input>
+                    <el-input v-model="formLabelAlignDetails.address"></el-input>
+                </el-form-item>
+                <el-form-item label="现住址">
+                    <el-input v-model="formLabelAlignDetails.now_address"></el-input>
                 </el-form-item>
                 <el-form-item label="银行卡号">
-                    <el-input placeholder="社保卡" v-model="formLabelAlignDetails.region"></el-input>
+                    <el-input placeholder="社保卡" v-model="formLabelAlignDetails.bank_card"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -295,6 +351,15 @@
                     street_id: '',
                     village_id: '',
                     nbc_id: '',
+                    user_name: '',
+                    age: '',
+                    sex: '',
+                    card_number: '',
+                    bank_card: '',
+                    address: '',
+                    type: '',
+                    mobile: '',
+                    now_address:''
                 },/*新增数据*/
                 formLabelAlignEdit: {},/*编辑数据*/
                 formLabelAlignDetails: {},/*编辑数据*/
@@ -309,8 +374,12 @@
                 input3: '',
                 select: '',
                 options: [],
-                optionsNbc:[],
-                optionsVill:[],
+                optionsNbc: [],
+                optionsVill: [],
+                optionsType: [
+                    {id: 0, type_name: "普通"}, {id: 1, type_name: "高龄"}, {id: 2, type_name: "残疾"},{id: 3, type_name: "困难"}
+                ],
+                optionsSex:[{id:0,sex_name:"男"},{id:1,sex_name:"女"}],
                 currentPage4: 1, /*分页*/
                 pageSize: 10,
                 total: 0,
@@ -326,14 +395,40 @@
             detailsFunction(index, row) {
                 let that = this
                 that.dialogFormVisibleDetails = true
-                that.formLabelAlignDetails = JSON.parse(JSON.stringify(row))
+                var params = {id: row.id, token: "wch1228310"}
+                axios.post(`${base.baseUrl}index.php/portal/old/getUser`, params)
+                    .then(function (res) {
+                        if (res.data.code === 1) {
+                            that.formLabelAlignDetails = res.data.data
+                            that.getSelectNbc(that.formLabelAlignDetails.street_id)
+                            for (var j = 0; j < that.optionsNbc.length; j++) {
+                                if (that.optionsNbc[j].id === that.formLabelAlignDetails.nbc_id) {
+                                    that.formLabelAlignDetails.nbc_id = that.optionsNbc[j].id
+                                    that.getSelectVill(that.formLabelAlignDetails.nbc_id)
+                                }
+                            }
+                            for (var a = 0; a < that.optionsVill.length; a++) {
+                                if (that.optionsVill[a].id === that.formLabelAlignDetails.village_id) {
+                                    that.formLabelAlignDetails.village_id = that.optionsVill[a].id
+                                }
+                            }
+                        } else {
+                            that.$message({
+                                type: 'error',
+                                message: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             },
             //新增确定
             okFunction() {
                 var that = this
                 var params = this.formLabelAlign
                 params.token = "wch1228310"
-                axios.post(`${base.baseUrl}index.php/portal/old/addStreet`, params)
+                axios.post(`${base.baseUrl}index.php/portal/old/addUser`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
                             that.$message({
@@ -359,7 +454,8 @@
                 var that = this
                 var params = that.formLabelAlignEdit
                 params.token = "wch1228310"
-                axios.post(`${base.baseUrl}index.php/portal/old/editStreet`, params)
+
+                axios.post(`${base.baseUrl}index.php/portal/old/editUser`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
                             that.$message({
@@ -384,7 +480,33 @@
             editFunction(index, row) {
                 let that = this
                 that.dialogFormVisibleEdit = true
-                that.formLabelAlignEdit = JSON.parse(JSON.stringify(row))
+                var params = {id: row.id, token: "wch1228310"}
+                axios.post(`${base.baseUrl}index.php/portal/old/getUser`, params)
+                    .then(function (res) {
+                        if (res.data.code === 1) {
+                            that.formLabelAlignEdit = res.data.data
+                            that.getSelectNbc(that.formLabelAlignEdit.street_id)
+                            for (var j = 0; j < that.optionsNbc.length; j++) {
+                                if (that.optionsNbc[j].id === that.formLabelAlignEdit.nbc_id) {
+                                    that.formLabelAlignEdit.nbc_id = that.optionsNbc[j].id
+                                }
+                            }
+                            that.getSelectVill(that.formLabelAlignEdit.nbc_id)
+                            for (var a = 0; a < that.optionsVill.length; a++) {
+                                if (that.optionsVill[a].id === that.formLabelAlignEdit.village_id) {
+                                    that.formLabelAlignEdit.village_id = that.optionsVill[a].id
+                                }
+                            }
+                        } else {
+                            that.$message({
+                                type: 'error',
+                                message: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             },
             //删除
             deleteFunction(index, row) {
@@ -394,10 +516,9 @@
                     type: 'warning'
                 }).then(() => {
                     let that = this
-                    var params = {id: row.id,token:"wch1228310"}
-                    axios.post(`${base.baseUrl}index.php/portal/old/deleteStreet`, params)
+                    var params = {id: row.id, token: "wch1228310"}
+                    axios.post(`${base.baseUrl}index.php/portal/old/deleteUser`, params)
                         .then(function (res) {
-                            console.log(res);
                             if (res.data.code === 1) {
                                 that.$message({
                                     type: 'success',
@@ -433,12 +554,99 @@
                     token: "wch1228310",
                     type: type
                 }
-                axios.post(`${base.baseUrl}index.php/portal/old/streetList`, params)
+                axios.post(`${base.baseUrl}index.php/portal/old/userList`, params)
                     .then(function (res) {
-                        that.tableData = res.data.data;
                         if (res.data.code === 1) {
+                            that.tableData = res.data.data;
                             that.tableData.length > 0 ? that.total = that.tableData.length : that.total = 0;
                         } else {
+                            that.$message({
+                                type: 'error',
+                                message: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+
+            //选择街道时
+            streetChange(id) {
+                this.getSelectNbc(id)
+            },
+            //选择居委会时
+            nbcChange(id) {
+                this.getSelectVill(id)
+            },
+            //获取街道选项
+            getSelect() {
+                var that = this
+                var params = {
+                    token: "wch1228310",
+                    type: 1,
+                }
+                axios.post(`${base.baseUrl}index.php/portal/old/streetList`, params)
+                    .then(function (res) {
+                        if (res.data.code === 1) {
+                            res.data.data.length === 0 ?
+                                that.options = [] : that.options = res.data.data;
+                        } else {
+                            that.$message({
+                                type: 'error',
+                                message: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+
+            //获取居委会选项
+            getSelectNbc(street_id) {
+                var that = this
+                var params = {
+                    token: "wch1228310",
+                    type: 1,
+                    street_id: street_id
+                }
+                axios.post(`${base.baseUrl}index.php/portal/old/nbcList`, params)
+                    .then(function (res) {
+                        if (res.data.code === 1) {
+                            that.optionsNbc = res.data.data;
+                        } else {
+                            if (res.data.data === "") {
+                                that.formLabelAlign.nbc_id = ''
+                                that.optionsNbc = []
+                            }
+                            that.$message({
+                                type: 'error',
+                                message: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            //获取小区选项
+            getSelectVill(nbc_id) {
+                var that = this
+                var params = {
+                    token: "wch1228310",
+                    type: 1,
+                    nbc_id: nbc_id
+                }
+                axios.post(`${base.baseUrl}index.php/portal/old/villageList`, params)
+                    .then(function (res) {
+                        if (res.data.code === 1) {
+                            that.optionsVill = res.data.data;
+                        } else {
+                            if (res.data.data === "") {
+                                that.formLabelAlign.village_id = ''
+                                that.optionsVill = []
+                            }
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
@@ -460,7 +668,8 @@
             },
         },
         mounted() {
-            this.gettpl(1,0)
+            this.gettpl(1, 0)
+            this.getSelect()
         }
     }
 </script>
@@ -489,11 +698,13 @@
             .aaa, .el-table {
                 margin-bottom: 20px;
             }
+
             .el-button--primary {
                 height: 30px;
                 padding: 0 10px;
                 background: linear-gradient(90deg, rgba(96, 157, 248, 1), rgba(84, 183, 235, 1));
             }
+
             .pagination_clumun {
                 margin-top: 20px;
                 box-sizing: border-box;
@@ -501,12 +712,14 @@
                 background: #ffffff;
                 align-items: center;
                 display: flex;
+
                 span {
                     font-size: 13px;
                     font-weight: 400;
                     color: #606266;
                 }
             }
+
             .el-input {
                 width: 40%;
                 float: right;

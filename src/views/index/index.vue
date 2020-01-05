@@ -3,7 +3,7 @@
         <el-container class="index-container">
             <el-aside class="index-aside" style="width: auto;">
                 <div class="index-aside-logo">
-                    <img src="http://121.42.234.123:8080/public/upload/logo/2018/04-10/da91523a817bc5adcb2c4c123bbf6e3f.png" alt="" :class="{actives:isCollapse==true}">
+                    <!--<img src="" alt="" :class="{actives:isCollapse==false}">-->
                 </div>
                 <!--导航菜单-->
                 <el-menu
@@ -93,28 +93,11 @@
                             <el-dropdown-menu slot="dropdown" >
                                 <el-dropdown-item command="login">
                                     <div class="ddd">
-                                        <img src="http://121.42.234.123:8080/public/static/images/icon-exit.png" alt="">
+                                        <img src="" alt="">
                                         <h5>退出系统</h5>
                                     </div>
                                 </el-dropdown-item >
-                                <el-dropdown-item>
-                                    <div class="ddd">
-                                        <img src="http://121.42.234.123:8080/public/static/images/cle-cache.png" alt="">
-                                        <h5>更新缓存</h5>
-                                    </div>
-                                </el-dropdown-item>
-                                <el-dropdown-item >
-                                    <div class="ddd">
-                                        <img src="http://121.42.234.123:8080/public/static/images/icon-switch.png" alt="">
-                                        <h5>切换小程序</h5>
-                                    </div>
-                                </el-dropdown-item>
-                                <el-dropdown-item >
-                                    <div class="ddd">
-                                        <img src="http://121.42.234.123:8080/public/static/images/icon-home.png" alt="">
-                                        <h5>打开商城</h5>
-                                    </div>
-                                </el-dropdown-item>
+
                             </el-dropdown-menu>
                         </el-dropdown>
 
@@ -141,14 +124,8 @@
             return {
                 menulist:[],
                 isRouter:this.$route.name,
-                isCollapse: true,
-                options: [{
-                    value: '选项1',
-                    label: '黄金糕'
-                }, {
-                    value: '选项2',
-                    label: '双皮奶'
-                }],
+                isCollapse: false,
+                options: [],
                 value: ''
             }
         },
@@ -222,8 +199,8 @@
         }
     }
     .index-aside-logo{
-        margin-top: 20px;
-        margin-bottom: 20px;
+        /*margin-top:10px;*/
+        margin-bottom: 10px;
         img{
             margin-left: 10px;
             margin-right: 10px;

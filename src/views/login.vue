@@ -1,6 +1,6 @@
 <template>
     <div class="login">
-        <el-carousel :interval="5000" arrow="never" height="625px" style="z-index: 1" indicator-position="none" id="carousel">
+        <el-carousel :interval="5000" arrow="never" height="700px" style="z-index: 1" indicator-position="none" id="carousel">
             <el-carousel-item v-for="item in 4" :key="item">
                 <!--走马灯-->
             </el-carousel-item>
@@ -8,7 +8,7 @@
         <!--登录-->
         <div class="login-login">
             <div class="login-img">
-                <img src="../assets/log.png" alt="">
+                <!--<img src="../assets/log.png" alt="">-->
             </div>
             <!--表单-->
             <div class="login-form">
@@ -40,7 +40,6 @@
 </template>
 
 <script>
-    import api from "../api/index"
     export default {
         name: "login",
         data() {
@@ -64,26 +63,6 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         this.$router.push('/index');
-                        return
-                        // console.log(this.ruleForm);
-                    //     api.login.checkLogin(this.ruleForm).then(res=>{
-                    //     console.log(res);
-                    //     // console.log(res.data.code);
-                    //     if (res.data.code === 200){
-                    //         this.$message({
-                    //             message: '登陆成功',
-                    //             type: 'success'
-                    //         });
-                    //         // this.$store.commit('tokenFun',res.data.data.token)
-                    //         // console.log(res.data.data.token);
-                    //         // this.$store.commit('updatefrom',this.ruleForm);
-                    //         this.$router.push('/index');
-                    //     }else {
-                    //         this.$message.error("登录失败")
-                    //     }
-                    // }).catch(err=>{
-                    //         this.$message.error("登录失败")
-                    //     })
                     } else {
                         this.$message.error("登录失败")
                     }
@@ -107,7 +86,7 @@
         display: flex;
         flex-direction: column;
         .login-img{
-            margin:0 auto;
+            margin:40px auto;
         }
         .login-form{
             width: 100%;

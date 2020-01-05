@@ -76,13 +76,51 @@ const routers = new VueRouter({
                     ]
                 },
                 {
-                    path:'/vip',
-                    name:'vip',
+                    path:"/vips",
+                    name:'vips',
                     meta:{
-                        icon:'el-icon-trophy',
+                        icon:'el-icon-edit',
                         title:'预定交费'
                     },
-                    component: ()=>import('@/views/vip/vip.vue')
+                    component: ()=>import('@/views/vips/vips.vue'),
+                    children:[
+                        {
+                            path:'/vip',
+                            name:'vip',
+                            meta:{
+                                icon:'el-icon-trophy',
+                                title:'交费'
+                            },
+                            component: ()=>import('@/views/vips/vip/vip.vue')
+                        },
+                        {
+                            path:'/vipdetails',
+                            name:'vipdetails',
+                            meta:{
+                                icon:'el-icon-trophy',
+                                title:'缴费情况管理'
+                            },
+                            component: ()=>import('@/views/vips/vipdetails/vipdetails.vue')
+                        },
+                        {
+                            path:'/fooddetails',
+                            name:'fooddetails',
+                            meta:{
+                                icon:'el-icon-trophy',
+                                title:'订餐情况'
+                            },
+                            component: ()=>import('@/views/vips/fooddetails/fooddetails.vue')
+                        },
+                    ]
+                },
+                {
+                    path:'/foodout',
+                    name:'foodout',
+                    meta:{
+                        icon:'el-icon-trophy',
+                        title:'取餐管理'
+                    },
+                    component: ()=>import('@/views/foodout/foodout.vue')
                 },
                 {
                     path:'/recom',

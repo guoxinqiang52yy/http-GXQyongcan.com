@@ -60,8 +60,17 @@
         </el-card>
         <!--新增对话框-->
         <el-dialog title="添加居委会" :visible.sync="dialogFormVisible">
-            <el-form label-width="80px" :model="formLabelAlign">
+            <el-form label-width="90px" :model="formLabelAlign">
                 <el-form-item label="所在街道">
+                    <!--<el-autocomplete-->
+                            <!--class="inline-input mediaInput"-->
+                            <!--size="mini"-->
+                            <!--v-model="formLabelAlign.street_id"-->
+                            <!--:fetch-suggestions="querySearch"-->
+                            <!--placeholder="请输入内容"-->
+                            <!--@select="handleSelect"-->
+                            <!--:trigger-on-focus="false"-->
+                    <!--&gt;</el-autocomplete>-->
                     <el-select v-model="formLabelAlign.street_id" placeholder="请选择">
                         <el-option
                                 v-for="item in options"
@@ -148,13 +157,7 @@
                 input2: '',
                 input3: '',
                 select: '',
-                options: [{
-                    value: '选项1',
-                    label: '黄金糕'
-                }, {
-                    value: '选项2',
-                    label: '双皮奶'
-                }],
+                options: [],
                 currentPage4: 1, /*分页*/
                 pageSize: 10,
                 total: 0,

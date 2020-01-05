@@ -67,10 +67,20 @@
         <!--新增对话框-->
         <el-dialog title="添加小区" :visible.sync="dialogFormVisible">
             <el-form label-width="100px" :model="formLabelAlign">
+                <el-form-item label="所在街道">
+                    <el-select v-model="formLabelAlign.street_id" placeholder="请选择" @change="streetChange(formLabelAlign.street_id)">
+                        <el-option
+                                v-for="item in options"
+                                :key="item.id"
+                                :label="item.street_name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="所在居委会">
                     <el-select v-model="formLabelAlign.nbc_id" placeholder="请选择">
                         <el-option
-                                v-for="item in options"
+                                v-for="item in optionsNbc"
                                 :key="item.id"
                                 :label="item.nbc_name"
                                 :value="item.id">
@@ -97,10 +107,20 @@
         <!--编辑对话框-->
         <el-dialog title="编辑小区" :visible.sync="dialogFormVisibleEdit">
             <el-form label-width="100px" :model="formLabelAlignEdit">
+                <el-form-item label="所在街道">
+                    <el-select v-model="formLabelAlignEdit.street_id" placeholder="请选择" @change="streetChange(formLabelAlignEdit.street_id)">
+                        <el-option
+                                v-for="item in options"
+                                :key="item.id"
+                                :label="item.street_name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="所在居委会">
                     <el-select v-model="formLabelAlignEdit.nbc_id" placeholder="请选择">
                         <el-option
-                                v-for="item in options"
+                                v-for="item in optionsNbc"
                                 :key="item.id"
                                 :label="item.nbc_name"
                                 :value="item.id">
@@ -141,7 +161,8 @@
                 formLabelAlign: {
                     village_name: '',
                     remark: '',
-                    nbc_id:''
+                    nbc_id:'',
+                    street_id:''
                 },/*新增数据*/
                 formLabelAlignEdit:{},/*编辑数据*/
                 dialogFormVisible: false,
@@ -153,13 +174,8 @@
                 input2: '',
                 input3: '',
                 select: '',
-                options: [{
-                    value: '选项1',
-                    label: '黄金糕'
-                }, {
-                    value: '选项2',
-                    label: '双皮奶'
-                }],
+                options: [],
+                optionsNbc:[],
                 currentPage4: 1, /*分页*/
                 pageSize: 10,
                 total: 0,
@@ -223,11 +239,19 @@
                 let that = this
                 that.dialogFormVisibleEdit = true
                 that.formLabelAlignEdit = JSON.parse(JSON.stringify(row))
-                for (var i = 0; i < that.options.length; i++) {
-                    if (that.options[i].nbc_name === that.formLabelAlignEdit.nbc_name) {
-                        that.formLabelAlignEdit.nbc_id = that.options[i].id
+                for (let i = 0; i < that.options.length; i++) {
+                    if (that.options[i].street_name === that.formLabelAlignEdit.street_name) {
+                        that.formLabelAlignEdit.street_id = that.options[i].id
+                        that.streetChange(that.formLabelAlignEdit.street_id,that.formLabelAlignEdit)
+                        for (let j = 0; j < that.optionsNbc.length; j++) {
+                            if (that.optionsNbc[j].nbc_name === that.formLabelAlignEdit.nbc_name) {
+                                that.formLabelAlignEdit.nbc_id = that.optionsNbc[j].id
+                            }
+                        }
                     }
                 }
+
+
             },
             //删除
             deleteFunction(index, row) {
@@ -240,7 +264,6 @@
                     var params = {id: row.id,token:"wch1228310"}
                     axios.post(`${base.baseUrl}index.php/portal/old/deleteVillage`, params)
                         .then(function (res) {
-                            console.log(res);
                             if (res.data.code === 1) {
                                 that.$message({
                                     type: 'success',
@@ -292,19 +315,50 @@
                         console.log(error);
                     });
             },
-            //获取居委会选项
+            streetChange(id,formLabelAlign){
+                var that = this
+                this.getSelectNbc(id,formLabelAlign)
+            },
+            //获取街道选项
             getSelect() {
                 var that = this
                 var params = {
                     token: "wch1228310",
                     type: 1,
                 }
-                axios.post(`${base.baseUrl}index.php/portal/old/nbcList`, params)
+                axios.post(`${base.baseUrl}index.php/portal/old/streetList`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
                             res.data.data.length === 0 ?
                                 that.options = [] : that.options = res.data.data;
                         } else {
+                            that.$message({
+                                type: 'error',
+                                message: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            //获取居委会选项
+            getSelectNbc(street_id,formLabelAlign) {
+                var that = this
+                var params = {
+                    token: "wch1228310",
+                    type: 1,
+                    street_id:street_id
+                }
+                axios.post(`${base.baseUrl}index.php/portal/old/nbcList`, params)
+                    .then(function (res) {
+                        if (res.data.code === 1) {
+                            that.optionsNbc = res.data.data
+                        } else {
+                            if (res.data.data === ""){
+                                formLabelAlign.nbc_id = ''
+                                that.optionsNbc = []
+                            }
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
