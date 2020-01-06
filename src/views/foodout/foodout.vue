@@ -4,7 +4,7 @@
         <!--卡片-->
         <el-card class="box-card">
             <div slot="header" class="clearfix">
-                <span>推荐库</span>
+                <span>取餐管理</span>
             </div>
             <div style="width: 100%;">
                 <el-form :rules="rules" :inline="true" :model="formLabelAlign" class="report_demo_form">
@@ -44,7 +44,6 @@
                     </el-row>
                 </el-form>
             </div>
-
         </el-card>
     </div>
 </template>
@@ -98,11 +97,10 @@
                 }
                 axios.post(`${base.baseUrl}index.php/portal/order/getMonth`, params)
                     .then(function (res) {
-                        console.log(res.data.data);
                         if (res.data.code === 1) {
-                            res.data.data.length === 0 ?
-                                that.options = [] : that.options = res.data.data;
+                            that.options = res.data.data;
                         } else {
+                            that.options = []
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
@@ -116,13 +114,11 @@
             //级联选择器
             handleChange(value) {
                 if (this.childArray.length > 0) {
-                    console.log(this.childArray);
                     for (var i = 0; i < this.childArray.length; i++) {
                         if (this.childArray[i].length > 0) {
                             for (var j = 0; j < this.childArray[i].length; j++) {
                                 if (this.childArray[i][j].name === value[2]) {
                                     this.formLabelAlign.village_ids = this.childArray[i][j].id
-                                    console.log(this.formLabelAlign.village_ids);
                                 }
                             }
 
@@ -130,7 +126,6 @@
 
                     }
                 }
-
             },
             //获取选项
             getSelect1() {
@@ -141,8 +136,7 @@
                 axios.post(`${base.baseUrl}index.php/portal/old/getList`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
-                            res.data.data.length === 0 ?
-                                that.options = [] : that.options = res.data.data;
+                            that.options = res.data.data;
                             for (var i = 0; i < that.options.length; i++) {
                                 if (that.options[i].child) {
                                     for (var j = 0; j < that.options[i].child.length; j++) {
@@ -154,6 +148,7 @@
                                 }
                             }
                         } else {
+                            that.options = []
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
@@ -165,9 +160,11 @@
                     });
             },
         },
+        created(){
+            this.getSelect1();
+        },
         mounted() {
             this.getSelect();
-            this.getSelect1();
         }
     }
 </script>

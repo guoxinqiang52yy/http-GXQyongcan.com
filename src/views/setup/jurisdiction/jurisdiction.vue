@@ -68,7 +68,7 @@
         <el-dialog title="添加小区" :visible.sync="dialogFormVisible">
             <el-form label-width="100px" :model="formLabelAlign">
                 <el-form-item label="所在街道">
-                    <el-select v-model="formLabelAlign.street_id" placeholder="请选择" @change="streetChange(formLabelAlign.street_id)">
+                    <el-select v-model="formLabelAlign.street_id" placeholder="请选择" @change="streetChange(formLabelAlign.street_id,formLabelAlign)">
                         <el-option
                                 v-for="item in options"
                                 :key="item.id"
@@ -108,7 +108,7 @@
         <el-dialog title="编辑小区" :visible.sync="dialogFormVisibleEdit">
             <el-form label-width="100px" :model="formLabelAlignEdit">
                 <el-form-item label="所在街道">
-                    <el-select v-model="formLabelAlignEdit.street_id" placeholder="请选择" @change="streetChange(formLabelAlignEdit.street_id)">
+                    <el-select v-model="formLabelAlignEdit.street_id" placeholder="请选择" @change="streetChange(formLabelAlignEdit.street_id,formLabelAlignEdit)">
                         <el-option
                                 v-for="item in options"
                                 :key="item.id"
@@ -161,8 +161,8 @@
                 formLabelAlign: {
                     village_name: '',
                     remark: '',
-                    nbc_id:'',
-                    street_id:''
+                    nbc_id:null,
+                    street_id:null
                 },/*新增数据*/
                 formLabelAlignEdit:{},/*编辑数据*/
                 dialogFormVisible: false,
@@ -356,7 +356,7 @@
                             that.optionsNbc = res.data.data
                         } else {
                             if (res.data.data === ""){
-                                formLabelAlign.nbc_id = ''
+                                formLabelAlign.nbc_id = null
                                 that.optionsNbc = []
                             }
                             that.$message({

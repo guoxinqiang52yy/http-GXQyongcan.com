@@ -5,10 +5,11 @@
                 <bread></bread>
                 <el-card class="box-card">
                     <div slot="header" class="clearfix">
-                        <span>用户管理</span>
+                        <span>缴费管理</span>
                     </div>
                     <div style="width: 100%;">
-                        <el-form :rules="rules" label-width="90px" :inline="true" :model="formInline" class="report_demo_form">
+                        <el-form :rules="rules" label-width="90px" :inline="true" :model="formInline"
+                                 class="report_demo_form">
                             <el-form-item label="用户姓名：" size="medium" style="width:19%">
                                 <el-input v-model="formInline.user_name"
                                           @keyup.enter.native="searchEnterFun"></el-input>
@@ -64,7 +65,11 @@
                                 <el-table-column label="姓名" prop="user_name" :resizable="false"></el-table-column>
                                 <el-table-column label="身份证号" prop="card_number" :resizable="false"></el-table-column>
                                 <el-table-column label="年龄" prop="age" :resizable="false"></el-table-column>
-                                <el-table-column label="性别" prop="sex" :resizable="false"></el-table-column>
+                                <el-table-column label="性别" prop="sex" :resizable="false">
+                                    <template slot-scope="scope">
+                                        <span>{{scope.row.sex === 0?"男":"女"}}</span>
+                                    </template>
+                                </el-table-column>
                                 <el-table-column label="电话" prop="mobile" :resizable="false">
                                     <template slot-scope="scope">
                                         <span>{{scope.row.mobile == null?"--":scope.row.mobile}}</span>
@@ -173,6 +178,8 @@
                     user_id: '',
                 },/*缴费表单数据*/
                 multipleSelection: [],
+                childArray: [],
+                childrenData: [],
                 props: {
                     value: "name",
                     label: "name",
@@ -180,10 +187,9 @@
                 },
                 rules: {
                     village_id: [
-                        {type: 'string',required: true, message:'请选择小区', trigger: 'change' }
+                        {type: 'string', required: true, message: '请选择小区', trigger: 'change'}
                     ]
                 },
-                childrenData: [],
             }
         },
         methods: {
@@ -199,16 +205,6 @@
                 }).catch(() => {
                 });
             },
-
-            //导出收据表
-            filingRate() {
-                // var a = document.createElement('a')
-                // // a.href = 'http://60.247.58.105:19608/api/item/export'
-                // a.href = `${base.baseUrl}/item/export`
-                // document.body.appendChild(a);
-                // a.click();
-                // document.body.removeChild(a);
-            },
             // 点击查询
             onSubmit() {
                 var that = this
@@ -219,11 +215,11 @@
                     }
                 }
                 var params = {
-                    username: that.formInline.user_name,
+                    user_name: that.formInline.user_name,
                     mobile: that.formInline.mobile,
                     village_id: that.formInline.village_ids,
-                    start_time:that.formInline.start_time,
-                    end_time:that.formInline.end_time,
+                    start_time: that.formInline.start_time,
+                    end_time: that.formInline.end_time,
                     token: "wch1228310",
                 }
                 axios.post(`${base.baseUrl}index.php/portal/order/userList`, params)
@@ -272,7 +268,6 @@
             okFunction() {
                 var that = this
                 this.formLabelAlign.send_date = this.formLabelAlign.send_date.join(",")
-                console.log(this.formLabelAlign.send_date);
                 var params = this.formLabelAlign
                 params.token = "wch1228310"
                 axios.post(`${base.baseUrl}index.php/portal/order/addOrder`, params)
@@ -305,9 +300,15 @@
             },
             //级联选择器
             handleChange(value) {
-                for (var i = 0; i < this.childrenData.length; i++) {
-                    if (this.childrenData[i].name === value[2]) {
-                        this.formInline.village_ids = this.childrenData[i].id
+                if (this.childArray.length > 0) {
+                    for (var i = 0; i < this.childArray.length; i++) {
+                        if (this.childArray[i].length > 0) {
+                            for (var j = 0; j < this.childArray[i].length; j++) {
+                                if (this.childArray[i][j].name === value[2]) {
+                                    this.formInline.village_ids = this.childArray[i][j].id
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -321,19 +322,19 @@
                     .then(function (res) {
                         console.log(res.data);
                         if (res.data.code === 1) {
-                            res.data.data.length === 0 ?
-                                that.options = [] : that.options = res.data.data;
+                            that.options = res.data.data;
                             for (var i = 0; i < that.options.length; i++) {
-                                console.log(that.options[i].child);
                                 if (that.options[i].child) {
                                     for (var j = 0; j < that.options[i].child.length; j++) {
                                         if (that.options[i].child[j].child) {
                                             that.childrenData = that.options[i].child[j].child
+                                            that.childArray.push(that.childrenData)
                                         }
                                     }
                                 }
                             }
                         } else {
+                            that.options = []
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
@@ -358,6 +359,7 @@
                             that.tableData = res.data.data;
                             that.tableData.length > 0 ? that.total = that.tableData.length : that.total = 0;
                         } else {
+                            that.tableData = []
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg

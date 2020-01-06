@@ -89,7 +89,7 @@ const routers = new VueRouter({
                             name:'vip',
                             meta:{
                                 icon:'el-icon-trophy',
-                                title:'交费'
+                                title:'缴费'
                             },
                             component: ()=>import('@/views/vips/vip/vip.vue')
                         },

@@ -185,6 +185,8 @@
                 datasDatas: [], /*查询年份*/
                 arrDate_: [{id: '', date: '全部'}], /*查询年份*/
                 multipleSelection: [],
+                childArray:[],
+                childrenData: [],
                 props: {
                     value: "name",
                     label: "name",
@@ -195,7 +197,6 @@
                         {type: 'string',required: true, message:'请选择小区', trigger: 'change' }
                     ]
                 },
-                childrenData: [],
             }
         },
         methods: {
@@ -221,7 +222,7 @@
                     }
                 }
                 var params = {
-                    username: that.formInline.user_name,
+                    user_name: that.formInline.user_name,
                     mobile: that.formInline.mobile,
                     village_id: that.formInline.village_ids,
                     start_time:that.formInline.start_time,
@@ -256,7 +257,7 @@
             editClickUp() {
                 var params = this.formInline
                 var a = document.createElement('a')
-                a.href = `${base.baseUrl}index.php/portal/order/excelPay?user_name=${params.user_name}&mobile=${params.mobile}&village_id=${params.village_id}&start_time=${params.start_time}&end_time=${params.end_time}&token=${"wch1228310"}`
+                a.href = `${base.baseUrl}index.php/portal/order/excelPay?user_name=${params.user_name}&mobile=${params.mobile}&village_id=${params.village_ids}&start_time=${params.start_time}&end_time=${params.end_time}&token=${"wch1228310"}`
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -309,7 +310,9 @@
             //新增确定
             okFunction() {
                 var that = this
-                this.formLabelAlign.send_date = this.formLabelAlign.send_date.join(",")
+                if (this.formLabelAlign.send_date){
+                    this.formLabelAlign.send_date = this.formLabelAlign.send_date.join(",")
+                }
                 var params = this.formLabelAlign
                 params.token = "wch1228310"
                 axios.post(`${base.baseUrl}index.php/portal/order/addOrder`, params)
@@ -342,9 +345,15 @@
             },
             //级联选择器
             handleChange(value) {
-                for (var i = 0; i < this.childrenData.length; i++) {
-                    if (this.childrenData[i].name === value[2]) {
-                        this.formInline.village_ids = this.childrenData[i].id
+                if (this.childArray.length > 0) {
+                    for (var i = 0; i < this.childArray.length; i++) {
+                        if (this.childArray[i].length > 0) {
+                            for (var j = 0; j < this.childArray[i].length; j++) {
+                                if (this.childArray[i][j].name === value[2]) {
+                                    this.formInline.village_ids = this.childArray[i][j].id
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -356,21 +365,20 @@
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/getList`, params)
                     .then(function (res) {
-                        console.log(res.data);
                         if (res.data.code === 1) {
-                            res.data.data.length === 0 ?
-                                that.options = [] : that.options = res.data.data;
+                            that.options = res.data.data;
                             for (var i = 0; i < that.options.length; i++) {
-                                console.log(that.options[i].child);
                                 if (that.options[i].child) {
                                     for (var j = 0; j < that.options[i].child.length; j++) {
                                         if (that.options[i].child[j].child) {
                                             that.childrenData = that.options[i].child[j].child
+                                            that.childArray.push(that.childrenData)
                                         }
                                     }
                                 }
                             }
                         } else {
+                            that.options = []
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
