@@ -485,6 +485,7 @@
                     .then(function (res) {
                         if (res.data.code === 1) {
                             that.formLabelAlignEdit = res.data.data
+                            console.log(that.formLabelAlignEdit);
                             that.getSelectNbc(that.formLabelAlignEdit.street_id)
                             for (var j = 0; j < that.optionsNbc.length; j++) {
                                 if (that.optionsNbc[j].id === that.formLabelAlignEdit.nbc_id) {

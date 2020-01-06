@@ -5,7 +5,8 @@
             <div slot="header" class="clearfix">
                 <span>小区管理</span>
             </div>
-            <el-button type="primary" icon="el-icon-circle-plus-outline" @click="dialogFormVisible = true" class="aaa" size="small">添加小区
+            <el-button type="primary" icon="el-icon-circle-plus-outline" @click="dialogFormVisible = true" class="aaa"
+                       size="small">添加小区
             </el-button>
             <!--表格-->
             <el-table
@@ -68,7 +69,8 @@
         <el-dialog title="添加小区" :visible.sync="dialogFormVisible">
             <el-form label-width="100px" :model="formLabelAlign">
                 <el-form-item label="所在街道">
-                    <el-select v-model="formLabelAlign.street_id" placeholder="请选择" @change="streetChange(formLabelAlign.street_id,formLabelAlign)">
+                    <el-select v-model="formLabelAlign.street_id" placeholder="请选择"
+                               @change="streetChange(formLabelAlign.street_id,formLabelAlign)">
                         <el-option
                                 v-for="item in options"
                                 :key="item.id"
@@ -108,7 +110,8 @@
         <el-dialog title="编辑小区" :visible.sync="dialogFormVisibleEdit">
             <el-form label-width="100px" :model="formLabelAlignEdit">
                 <el-form-item label="所在街道">
-                    <el-select v-model="formLabelAlignEdit.street_id" placeholder="请选择" @change="streetChange(formLabelAlignEdit.street_id,formLabelAlignEdit)">
+                    <el-select v-model="formLabelAlignEdit.street_id" placeholder="请选择"
+                               @change="streetChange(formLabelAlignEdit.street_id,formLabelAlignEdit)">
                         <el-option
                                 v-for="item in options"
                                 :key="item.id"
@@ -152,6 +155,7 @@
     import api from "../../../api/index"
     import base from '../../../api/base'
     import axios from "axios";
+
     export default {
         name: "shopguige",
         components: {bread},
@@ -161,10 +165,10 @@
                 formLabelAlign: {
                     village_name: '',
                     remark: '',
-                    nbc_id:null,
-                    street_id:null
+                    nbc_id: null,
+                    street_id: null
                 },/*新增数据*/
-                formLabelAlignEdit:{},/*编辑数据*/
+                formLabelAlignEdit: {},/*编辑数据*/
                 dialogFormVisible: false,
                 dialogFormVisibleEdit: false,
                 formLabelWidth: '80px',
@@ -175,7 +179,7 @@
                 input3: '',
                 select: '',
                 options: [],
-                optionsNbc:[],
+                optionsNbc: [],
                 currentPage4: 1, /*分页*/
                 pageSize: 10,
                 total: 0,
@@ -236,19 +240,17 @@
             },
             //点击编辑
             editFunction(index, row) {
-                let that = this
-                that.dialogFormVisibleEdit = true
+                var that = this
+                that.optionsNbc = []
+                that.formLabelAlignEdit = {}
                 that.formLabelAlignEdit = JSON.parse(JSON.stringify(row))
-                for (let i = 0; i < that.options.length; i++) {
-                    if (that.options[i].street_name === that.formLabelAlignEdit.street_name) {
+                that.dialogFormVisibleEdit = true
+                for (let i = 0; i < this.options.length; i++) {
+                    if (that.options[i].street_name == that.formLabelAlignEdit.street_name) {
                         that.formLabelAlignEdit.street_id = that.options[i].id
-                        that.streetChange(that.formLabelAlignEdit.street_id,that.formLabelAlignEdit)
-                        for (let j = 0; j < that.optionsNbc.length; j++) {
-                            if (that.optionsNbc[j].nbc_name === that.formLabelAlignEdit.nbc_name) {
-                                that.formLabelAlignEdit.nbc_id = that.optionsNbc[j].id
-                            }
-                        }
+                        that.getSelectNbc(that.formLabelAlignEdit.street_id, that.formLabelAlignEdit)
                     }
+
                 }
 
 
@@ -261,7 +263,7 @@
                     type: 'warning'
                 }).then(() => {
                     let that = this
-                    var params = {id: row.id,token:"wch1228310"}
+                    var params = {id: row.id, token: "wch1228310"}
                     axios.post(`${base.baseUrl}index.php/portal/old/deleteVillage`, params)
                         .then(function (res) {
                             if (res.data.code === 1) {
@@ -315,9 +317,9 @@
                         console.log(error);
                     });
             },
-            streetChange(id,formLabelAlign){
+            streetChange(id, formLabelAlign) {
                 var that = this
-                this.getSelectNbc(id,formLabelAlign)
+                this.getSelectNbc(id, formLabelAlign)
             },
             //获取街道选项
             getSelect() {
@@ -343,19 +345,26 @@
                     });
             },
             //获取居委会选项
-            getSelectNbc(street_id,formLabelAlign) {
+            getSelectNbc(street_id, formLabelAlign) {
                 var that = this
                 var params = {
                     token: "wch1228310",
                     type: 1,
-                    street_id:street_id
+                    street_id: street_id
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/nbcList`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
                             that.optionsNbc = res.data.data
+                            for (let j = 0; j < that.optionsNbc.length; j++) {
+                                if (that.optionsNbc[j].nbc_name == that.formLabelAlignEdit.nbc_name) {
+                                    that.formLabelAlignEdit.nbc_id = that.optionsNbc[j].id
+                                } else {
+                                    that.formLabelAlignEdit.nbc_id = null
+                                }
+                            }
                         } else {
-                            if (res.data.data === ""){
+                            if (res.data.data === "") {
                                 formLabelAlign.nbc_id = null
                                 that.optionsNbc = []
                             }
@@ -380,7 +389,7 @@
             },
         },
         mounted() {
-            this.gettpl(1,0)
+            this.gettpl(1, 0)
             this.getSelect()
         }
     }
@@ -407,14 +416,16 @@
         }
 
         .box-card {
-            .aaa,.el-table{
+            .aaa, .el-table {
                 margin-bottom: 20px;
             }
+
             .el-button--primary {
                 height: 30px;
                 padding: 0 10px;
                 background: linear-gradient(90deg, rgba(96, 157, 248, 1), rgba(84, 183, 235, 1));
             }
+
             .pagination_clumun {
                 margin-top: 20px;
                 box-sizing: border-box;
@@ -422,12 +433,14 @@
                 background: #ffffff;
                 align-items: center;
                 display: flex;
+
                 span {
                     font-size: 13px;
                     font-weight: 400;
                     color: #606266;
                 }
             }
+
             .el-input {
                 width: 40%;
                 float: right;
