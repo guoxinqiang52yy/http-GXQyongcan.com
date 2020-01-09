@@ -28,7 +28,8 @@
                                         end-placeholder="结束">
                                 </el-date-picker>
                             </el-form-item>
-                            <el-form-item label="小区：" size="medium" style="width:30%" prop="village_id">
+                            <el-form-item class="foodout1" label="小区：" size="medium" style=""
+                                          prop="village_id">
                                 <el-cascader
                                         placeholder="街道/居委会/小区"
                                         v-model="formInline.village_id"
@@ -36,6 +37,8 @@
                                         @change="handleChange"
                                         :props="props">
                                 </el-cascader>
+                                <el-input :disabled="true" class="formLabelAlign"
+                                          v-model="formInline.village_id"></el-input>
                             </el-form-item>
                             <el-row class="myReportD">
                                 <el-col :span="20" style="border: none;">
@@ -89,9 +92,8 @@
                                         @size-change="handleSizeChange"
                                         @current-change="handleCurrentChange"
                                         :current-page="currentPage4"
-                                        :page-sizes="[20,40,60]"
                                         :page-size="pageSize"
-                                        layout="total, sizes, prev, pager, next, jumper"
+                                        layout="total, prev, pager, next"
                                         :total="total">
                                 </el-pagination>
                             </div>
@@ -111,8 +113,14 @@
                 </el-form-item>
                 <el-form-item label="标准">
                     <el-select v-model="formLabelAlign.standard">
-                        <el-option label="12元" value="1"></el-option>
+                        <el-option label="13元" value="1"></el-option>
                         <el-option label="15元" value="2"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="缴费状态">
+                    <el-select v-model="formLabelAlign.pay_status">
+                        <el-option label="未交" value="0"></el-option>
+                        <el-option label="已交" value="1"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="配送方式">
@@ -156,7 +164,7 @@
                 rows: {},
                 options: [],
                 currentPage4: 1, /*分页*/
-                pageSize: 10,
+                pageSize: 20,
                 total: 0,
                 tableData: [], /*表格数据*/
                 formInline: {
@@ -176,6 +184,7 @@
                     send_type: '',
                     send_date: [],
                     user_id: '',
+                    pay_status:''
                 },/*缴费表单数据*/
                 multipleSelection: [],
                 childArray: [],
@@ -220,15 +229,16 @@
                     village_id: that.formInline.village_ids,
                     start_time: that.formInline.start_time,
                     end_time: that.formInline.end_time,
-                    token: "wch1228310",
+                    token: sessionStorage.getItem("setToken"),
                 }
                 axios.post(`${base.baseUrl}index.php/portal/order/userList`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
                             that.tableData = res.data.data;
-                            that.tableData.length > 0 ? that.total = that.tableData.length : that.total = 0;
+                            that.total = res.data.count
                         } else {
                             that.tableData = []
+                            that.total = 0;
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
@@ -249,11 +259,11 @@
             //分页
             handleSizeChange(val) {
                 this.pageSize = val;
-                this.gettpl(this.pageSize, 1)
+                this.gettpl(this.pageSize)
             },
             handleCurrentChange(val) {
                 this.currentPage4 = val;
-                this.gettpl(this.currentPage4, 1)
+                this.gettpl(this.currentPage4)
             },
             row_key(row) {
                 return row.id;
@@ -269,7 +279,7 @@
                 var that = this
                 this.formLabelAlign.send_date = this.formLabelAlign.send_date.join(",")
                 var params = this.formLabelAlign
-                params.token = "wch1228310"
+                params.token = sessionStorage.getItem("setToken")
                 axios.post(`${base.baseUrl}index.php/portal/order/addOrder`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
@@ -300,6 +310,7 @@
             },
             //级联选择器
             handleChange(value) {
+                this.formInline.village_id = value.join("/")
                 if (this.childArray.length > 0) {
                     for (var i = 0; i < this.childArray.length; i++) {
                         if (this.childArray[i].length > 0) {
@@ -316,7 +327,7 @@
             getSelect() {
                 var that = this
                 var params = {
-                    token: "wch1228310",
+                    token: sessionStorage.getItem("setToken"),
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/getList`, params)
                     .then(function (res) {
@@ -350,16 +361,17 @@
                 var that = this
                 var params = {
                     page: page,
-                    token: "wch1228310",
+                    token: sessionStorage.getItem("setToken"),
                     type: type
                 }
                 axios.post(`${base.baseUrl}index.php/portal/order/userList`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
                             that.tableData = res.data.data;
-                            that.tableData.length > 0 ? that.total = that.tableData.length : that.total = 0;
+                            that.total = res.data.count
                         } else {
                             that.tableData = []
+                            that.total = 0
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
@@ -382,6 +394,7 @@
 </script>
 
 <style lang="less" scoped>
+
     .table_pagination {
         flex: 1;
         display: flex;
@@ -414,6 +427,7 @@
         background: linear-gradient(90deg, rgba(96, 157, 248, 1), rgba(84, 183, 235, 1));
     }
 
+
     .el-button {
         height: 30px;
         padding: 0 10px;
@@ -422,12 +436,11 @@
 
     .box {
         .form_inline {
-            .el-input {
-                width: 274px;
-                height: 54px;
-            }
+            /*.el-input {*/
+            /*width: 274px;*/
+            /*height: 54px;*/
+            /*}*/
         }
-
         .percentage {
             width: 100px;
             margin: 0 10px;
@@ -467,16 +480,16 @@
                     border-bottom: 1px solid rgba(0, 0, 0, .1);
                 }
 
-                .el-form-item .el-input, .el-select {
-                    width: 150px;
-                }
+                /*.el-form-item .el-input, .el-select {*/
+                    /*width: 150px;*/
+                /*}*/
 
                 .demo-table-expand {
                     font-size: 0;
                 }
 
                 .demo-table-expand label {
-                    width: 90px;
+                    /*width: 90px;*/
                     color: #99a9bf;
                 }
 
@@ -498,8 +511,21 @@
         width: 60% !important;
     }
 
-    /deep/ .report_demo_form .el-form-item__content .el-date-editor, .report_demo_form .el-form-item__content .el-input, .report_demo_form .el-form-item__content .el-input__inner, .report_demo_form .el-form-item__content .el-select {
+    /deep/ .report_demo_form .el-form-item__content .el-date-editor, .report_demo_form .el-form-item__content, .report_demo_form .report_demo_form .el-form-item__content .el-select {
         width: 100% !important;
+    }
+
+    .foodout1 {
+        position: relative;
+
+    }
+
+    .foodout1 .formLabelAlign {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 80% !important;
+
     }
 
     .report_demo_form .el-form--inline .el-form-item {

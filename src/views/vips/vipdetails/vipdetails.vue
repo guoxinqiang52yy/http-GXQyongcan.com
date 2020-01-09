@@ -8,7 +8,8 @@
                         <span>缴费情况管理</span>
                     </div>
                     <div style="width: 100%;">
-                        <el-form :rules="rules" label-width="90px" :inline="true" :model="formInline" class="report_demo_form">
+                        <el-form :rules="rules" label-width="90px" :inline="true" :model="formInline"
+                                 class="report_demo_form">
                             <el-form-item label="用户姓名：" size="medium" style="width:19%">
                                 <el-input v-model="formInline.user_name"
                                           @keyup.enter.native="searchEnterFun"></el-input>
@@ -27,7 +28,7 @@
                                         end-placeholder="结束">
                                 </el-date-picker>
                             </el-form-item>
-                            <el-form-item prop="village_id"  label="小区：" size="medium" style="width:30%">
+                            <el-form-item class="foodout1" prop="village_id" label="小区：" size="medium">
                                 <el-cascader
                                         placeholder="街道/居委会/小区"
                                         v-model="formInline.village_id"
@@ -35,6 +36,8 @@
                                         @change="handleChange"
                                         :props="props">
                                 </el-cascader>
+                                <el-input :disabled="true" class="formLabelAlign"
+                                          v-model="formInline.village_id"></el-input>
                             </el-form-item>
                             <el-row class="myReportD">
                                 <el-col :span="20" style="border: none;">
@@ -58,7 +61,7 @@
                         <div style="width: 100%;">
                             <!--表格-->
                             <el-table ref="table" class="form1"
-                                      :row-key="row_key"
+
                                       :cell-style="cellStyle"
                                       :header-cell-style="{'background-color': '#F3F6FD','color': '#606266','padding': '10px 0','text-align':'center'}"
                                       border stripe highlight-current-row :data="tableData">
@@ -81,10 +84,21 @@
                                 </el-table-column>
                                 <el-table-column label="缴费日期" prop="add_time" :resizable="false"></el-table-column>
                                 <el-table-column label="交费金额" prop="money" :resizable="false"></el-table-column>
-                                <el-table-column label="操作" :resizable="false">
+                                <el-table-column label="缴费状态" prop="pay_status" :resizable="false">
                                     <template slot-scope="scope">
-                                        <el-button type="text" style="color:#32AFF0;marginLeft:6px;"
-                                                   @click="showInTable(scope.row)">缴费详情
+                                        <span>{{scope.row.pay_status == 0?"未交":"已交"}}</span>
+                                    </template>
+
+                                </el-table-column>
+                                <el-table-column fixed="right"
+                                                 label="操作"
+                                                 width="150">
+                                    <template slot-scope="scope">
+                                        <el-button type="text" @click="showInTable(scope.row)">
+                                            缴费
+                                        </el-button>
+                                        <el-button type="text" :class="scope.row.pay_status == 0?'paystatus':'paystatushide'" @click="showIngo(scope.row)">
+                                            补交
                                         </el-button>
                                     </template>
                                 </el-table-column>
@@ -95,9 +109,8 @@
                                         @size-change="handleSizeChange"
                                         @current-change="handleCurrentChange"
                                         :current-page="currentPage4"
-                                        :page-sizes="[20,40,60]"
                                         :page-size="pageSize"
-                                        layout="total, sizes, prev, pager, next, jumper"
+                                        layout="total, prev, pager, next"
                                         :total="total">
                                 </el-pagination>
                             </div>
@@ -121,7 +134,7 @@
                 <el-table-column label="主食" prop="main_food" :resizable="false"></el-table-column>
                 <el-table-column label="标准" prop="standard" :resizable="false">
                     <template slot-scope="scope">
-                        <span>{{scope.row.standard == 12?"12元":"15元"}}</span>
+                        <span>{{scope.row.standard == 13?"13元":"15元"}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="配送日期" prop="send_date" :resizable="false"></el-table-column>
@@ -137,9 +150,8 @@
                         @size-change="handleSizeChange3"
                         @current-change="handleCurrentChange3"
                         :current-page="currentPage3"
-                        :page-sizes="[20,40,60]"
                         :page-size="pageSize3"
-                        layout="total, sizes, prev, pager, next, jumper"
+                        layout="total, prev, pager, next"
                         :total="total1">
                 </el-pagination>
             </div>
@@ -161,18 +173,19 @@
         components: {bread},
         data() {
             return {
+                pay_status: false,
                 dialogFormVisibleGo: false,
                 hackReset: false,
                 rows: {},
                 options: [],
                 currentPage4: 1, /*分页*/
-                pageSize: 10,
+                pageSize: 20,
                 currentPage3: 1, /*分页*/
-                pageSize3: 10,
+                pageSize3: 20,
                 total: 0,
-                total1:0,
+                total1: 0,
                 tableData: [], /*表格数据*/
-                tableDataIn:[],/*详情表格*/
+                tableDataIn: [],/*详情表格*/
                 formInline: {
                     user_name: '',
                     mobile: '',
@@ -185,7 +198,7 @@
                 datasDatas: [], /*查询年份*/
                 arrDate_: [{id: '', date: '全部'}], /*查询年份*/
                 multipleSelection: [],
-                childArray:[],
+                childArray: [],
                 childrenData: [],
                 props: {
                     value: "name",
@@ -194,12 +207,46 @@
                 },
                 rules: {
                     village_id: [
-                        {type: 'string',required: true, message:'请选择小区', trigger: 'change' }
+                        {type: 'string', required: true, message: '请选择小区', trigger: 'change'}
                     ]
                 },
             }
         },
         methods: {
+            //补交
+            showIngo(row) {
+                this.$confirm(`是否补交${row.money}元?`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    let that = this
+                    var params = {id: row.id, token: sessionStorage.getItem("setToken")}
+                    axios.post(`${base.baseUrl}index.php/portal/order/buJiao`, params)
+                        .then(function (res) {
+                            if (res.data.code === 1) {
+                                that.$message({
+                                    type: 'success',
+                                    message: res.data.msg
+                                })
+                                that.gettpl(1, 0)
+                            } else {
+                                that.$message({
+                                    type: 'error',
+                                    message: res.data.msg
+                                })
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消补交'
+                    });
+                });
+            },
             // 销毁组件
             handleClose() {
                 this.$confirm('确认关闭?', '提示').then(() => {
@@ -225,17 +272,18 @@
                     user_name: that.formInline.user_name,
                     mobile: that.formInline.mobile,
                     village_id: that.formInline.village_ids,
-                    start_time:that.formInline.start_time,
-                    end_time:that.formInline.end_time,
-                    token: "wch1228310",
+                    start_time: that.formInline.start_time,
+                    end_time: that.formInline.end_time,
+                    token: sessionStorage.getItem("setToken"),
                 }
                 axios.post(`${base.baseUrl}index.php/portal/order/orderList`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
                             that.tableData = res.data.data;
-                            that.tableData.length > 0 ? that.total = that.tableData.length : that.total = 0;
+                            that.total = res.data.count
                         } else {
-                            that.tableData = []
+                            that.total = 0;
+                            that.tableData = [];
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
@@ -256,8 +304,9 @@
             //领取表
             editClickUp() {
                 var params = this.formInline
+                console.log(params);
                 var a = document.createElement('a')
-                a.href = `${base.baseUrl}index.php/portal/order/excelPay?user_name=${params.user_name}&mobile=${params.mobile}&village_id=${params.village_ids}&start_time=${params.start_time}&end_time=${params.end_time}&token=${"wch1228310"}`
+                a.href = `${base.baseUrl}index.php/portal/order/excelPay?user_name=${params.user_name}&mobile=${params.mobile}&village_id=${params.village_ids}&start_time=${params.start_time}&end_time=${params.end_time}&token=${sessionStorage.getItem("setToken")}`
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -265,19 +314,19 @@
             //分页
             handleSizeChange(val) {
                 this.pageSize = val;
-                this.gettpl(this.pageSize, 1)
+                this.gettpl(this.pageSize)
             },
             handleCurrentChange(val) {
                 this.currentPage4 = val;
-                this.gettpl(this.currentPage4, 1)
+                this.gettpl(this.currentPage4)
             },
             handleSizeChange3(val) {
                 this.pageSize3 = val;
-                this.gettpl(this.pageSize3, 1)
+                this.gettpl(this.pageSize3)
             },
             handleCurrentChange3(val) {
                 this.currentPage3 = val;
-                this.gettpl(this.currentPage3, 1)
+                this.gettpl(this.currentPage3)
             },
             row_key(row) {
                 return row.id;
@@ -287,16 +336,17 @@
                 let that = this
                 that.dialogFormVisibleGo = true
                 var params = {
-                    token:"wch1228310",
-                    id:row.id
+                    token: sessionStorage.getItem("setToken"),
+                    id: row.id
                 }
                 axios.post(`${base.baseUrl}index.php/portal/order/orderDetail`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
                             that.tableDataIn = res.data.data;
-                            that.tableDataIn.length > 0 ? that.total1 = that.tableDataIn.length : that.total1 = 0;
+                            that.total1 = res.data.data.length
                         } else {
-                            that.tableDataIn = []
+                            that.total1 = 0;
+                            that.tableDataIn = [];
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
@@ -310,11 +360,11 @@
             //新增确定
             okFunction() {
                 var that = this
-                if (this.formLabelAlign.send_date){
+                if (this.formLabelAlign.send_date) {
                     this.formLabelAlign.send_date = this.formLabelAlign.send_date.join(",")
                 }
                 var params = this.formLabelAlign
-                params.token = "wch1228310"
+                params.token = sessionStorage.getItem("setToken")
                 axios.post(`${base.baseUrl}index.php/portal/order/addOrder`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
@@ -345,6 +395,7 @@
             },
             //级联选择器
             handleChange(value) {
+                this.formInline.village_id = value.join("/")
                 if (this.childArray.length > 0) {
                     for (var i = 0; i < this.childArray.length; i++) {
                         if (this.childArray[i].length > 0) {
@@ -361,7 +412,7 @@
             getSelect() {
                 var that = this
                 var params = {
-                    token: "wch1228310",
+                    token: sessionStorage.getItem("setToken"),
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/getList`, params)
                     .then(function (res) {
@@ -394,7 +445,7 @@
                 var that = this
                 var params = {
                     page: page,
-                    token: "wch1228310",
+                    token:sessionStorage.getItem("setToken"),
                     type: type
                 }
                 axios.post(`${base.baseUrl}index.php/portal/order/orderList`, params)
@@ -425,31 +476,13 @@
 </script>
 
 <style lang="less" scoped>
-    .table_pagination {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        background-color: #fff;
-        overflow: hidden;
-        padding: 0 20px 20px 20px;
 
-
-        .pagination_clumun {
-            margin-top: 20px;
-            box-sizing: border-box;
-            width: 100%;
-            background: #ffffff;
-            align-items: center;
-            display: flex;
-
-            span {
-                font-size: 13px;
-                font-weight: 400;
-                color: #606266;
-            }
-        }
-    }
-
+.paystatus{
+    display: block;
+}
+.paystatushide{
+    display: none;
+}
     .el-button--primary {
         height: 30px;
         padding: 0 10px;
@@ -465,10 +498,10 @@
 
     .box {
         .form_inline {
-            .el-input {
-                width: 274px;
-                height: 54px;
-            }
+            /*.el-input {*/
+            /*width: 274px;*/
+            /*height: 54px;*/
+            /*}*/
         }
 
         .percentage {
@@ -510,9 +543,9 @@
                     border-bottom: 1px solid rgba(0, 0, 0, .1);
                 }
 
-                .el-form-item .el-input, .el-select {
-                    width: 150px;
-                }
+                /*.el-form-item .el-input, .el-select {*/
+                /*width: 150px;*/
+                /*}*/
 
                 .demo-table-expand {
                     font-size: 0;
@@ -541,8 +574,21 @@
         width: 60% !important;
     }
 
-    /deep/ .report_demo_form .el-form-item__content .el-date-editor, .report_demo_form .el-form-item__content .el-input, .report_demo_form .el-form-item__content .el-input__inner, .report_demo_form .el-form-item__content .el-select {
+    /deep/ .report_demo_form .el-form-item__content .el-date-editor, .report_demo_form .el-form-item__content, .report_demo_form .report_demo_form .el-form-item__content .el-select {
         width: 100% !important;
+    }
+
+    .foodout1 {
+        position: relative;
+
+    }
+
+    .foodout1 .formLabelAlign {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 80% !important;
+
     }
 
     .report_demo_form .el-form--inline .el-form-item {

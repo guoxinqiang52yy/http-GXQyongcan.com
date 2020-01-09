@@ -1,5 +1,5 @@
 <template>
-    <div class="recom">
+    <div class="foodout">
         <bread></bread>
         <!--卡片-->
         <el-card class="box-card">
@@ -7,7 +7,7 @@
                 <span>取餐管理</span>
             </div>
             <div style="width: 100%;">
-                <el-form :rules="rules" :inline="true" :model="formLabelAlign" class="report_demo_form">
+                <el-form :inline="true" :model="formLabelAlign" class="report_demo_form">
                     <el-form-item label="选择日期：" size="medium" style="width:50%" prop="month">
                         <el-date-picker
                                 v-model="formLabelAlign.date"
@@ -18,14 +18,17 @@
                                 end-placeholder="结束">
                         </el-date-picker>
                     </el-form-item>
-                    <el-form-item prop="village_id" label="小区：" size="medium" style="width:30%">
+                    <el-form-item class="foodout1" label="小区：" size="medium" style="width:30%">
                         <el-cascader
+                                clearable
                                 placeholder="街道/居委会/小区"
-                                v-model="formLabelAlign.village_id"
+                                v-model.lazy="formLabelAlign.village_id"
                                 :options="options"
                                 @change="handleChange"
                                 :props="props">
                         </el-cascader>
+                        <el-input :disabled="true" class="formLabelAlign"
+                                  v-model="formLabelAlign.village_id"></el-input>
                     </el-form-item>
                     <el-row class="myReportD">
                         <el-col :span="20" style="border: none;">
@@ -66,11 +69,6 @@
                 options: [],
                 childrenData: [],
                 childArray: [],
-                rules: {
-                    month: [
-                        {type: 'string', required: true, message: '请选择月份', trigger: 'change'}
-                    ]
-                },
                 props: {
                     value: "name",
                     label: "name",
@@ -82,61 +80,52 @@
             //领取表
             editClickUp() {
                 var params = this.formLabelAlign
-                var a = document.createElement('a')
-                a.href = `${base.baseUrl}index.php/portal/order/excelText?date=${params.date}&village_id=${params.village_ids}&token=${"wch1228310"}`
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            },
-            //获取街道选项
-            getSelect() {
-                var that = this
-                var params = {
-                    token: "wch1228310",
-                    type: 1,
+                if (params.village_ids != "" && params.date != "") {
+                    var a = document.createElement('a')
+                    a.href = `${base.baseUrl}index.php/portal/order/excelText?date=${params.date}&village_id=${params.village_ids}&token=${sessionStorage.getItem("setToken")}`
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    if (params.village_ids == ""){
+                        this.$message({
+                            type: 'info',
+                            message: "请选择小区"
+                        })
+                    }
+                    if (params.date == ""){
+                        this.$message({
+                            type: 'info',
+                            message: "请选择时间"
+                        })
+                    }
                 }
-                axios.post(`${base.baseUrl}index.php/portal/order/getMonth`, params)
-                    .then(function (res) {
-                        if (res.data.code === 1) {
-                            that.options = res.data.data;
-                        } else {
-                            that.options = []
-                            that.$message({
-                                type: 'error',
-                                message: res.data.msg
-                            })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
             },
             //级联选择器
             handleChange(value) {
+                this.formLabelAlign.village_id = value.join("/")
                 if (this.childArray.length > 0) {
                     for (var i = 0; i < this.childArray.length; i++) {
                         if (this.childArray[i].length > 0) {
                             for (var j = 0; j < this.childArray[i].length; j++) {
-                                if (this.childArray[i][j].name === value[2]) {
+                                if (this.childArray[i][j].name == value[2]) {
                                     this.formLabelAlign.village_ids = this.childArray[i][j].id
                                 }
                             }
-
                         }
-
                     }
                 }
             },
             //获取选项
             getSelect1() {
-                var that = this
+                let that = this
                 var params = {
-                    token: "wch1228310",
+                    token: sessionStorage.getItem("setToken"),
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/getList`, params)
                     .then(function (res) {
-                        if (res.data.code === 1) {
-                            that.options = res.data.data;
+                        if (res.data.code == 1) {
+                            that.options = res.data.data
                             for (var i = 0; i < that.options.length; i++) {
                                 if (that.options[i].child) {
                                     for (var j = 0; j < that.options[i].child.length; j++) {
@@ -148,8 +137,8 @@
                                 }
                             }
                         } else {
-                            that.options = []
-                            that.$message({
+                            this.options = []
+                            this.$message({
                                 type: 'error',
                                 message: res.data.msg
                             })
@@ -160,19 +149,14 @@
                     });
             },
         },
-        created(){
-            this.getSelect1();
-        },
         mounted() {
-            this.getSelect();
+            this.getSelect1();
         }
     }
 </script>
 
 <style scoped lang="less">
-    .recom {
-
-
+    .foodout {
         .box-card {
             width: 100%;
 
@@ -187,8 +171,25 @@
                 }
             }
 
+            .el-button--primary {
+                height: 30px;
+                padding: 0 10px;
+                background: linear-gradient(90deg, rgba(96, 157, 248, 1), rgba(84, 183, 235, 1));
+            }
+
             .el-select .el-input {
                 width: 130px;
+            }
+
+            .foodout1 {
+                position: relative;
+            }
+
+            .foodout1 .formLabelAlign {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 80%;
             }
 
             .input-with-select .el-input-group__prepend {

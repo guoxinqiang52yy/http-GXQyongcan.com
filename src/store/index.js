@@ -13,7 +13,8 @@ const stores=new Vuex.Store({
             password:''
         },
         token:'',
-        url:'http://www.jiaju.com/'
+        url:'http://www.jiaju.com/',
+        navList:{}
     },
     mutations:{
         updatefrom:function (state,obj) {

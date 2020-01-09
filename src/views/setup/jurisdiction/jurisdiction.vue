@@ -58,9 +58,8 @@
                         @size-change="handleSizeChange"
                         @current-change="handleCurrentChange"
                         :current-page="currentPage4"
-                        :page-sizes="[10,20,30]"
                         :page-size="pageSize"
-                        layout="total, sizes, prev, pager, next, jumper"
+                        layout="total, prev, pager, next"
                         :total="total">
                 </el-pagination>
             </div>
@@ -121,7 +120,8 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所在居委会">
-                    <el-select v-model="formLabelAlignEdit.nbc_id" placeholder="请选择">
+                    <el-select v-model="formLabelAlignEdit.nbc_id" placeholder="请选择"
+                               @change="nbcChange">
                         <el-option
                                 v-for="item in optionsNbc"
                                 :key="item.id"
@@ -181,80 +181,11 @@
                 options: [],
                 optionsNbc: [],
                 currentPage4: 1, /*分页*/
-                pageSize: 10,
+                pageSize: 20,
                 total: 0,
             }
         },
         methods: {
-            //新增确定
-            okFunction() {
-                var that = this
-                var params = this.formLabelAlign
-                params.token = "wch1228310"
-                axios.post(`${base.baseUrl}index.php/portal/old/addVillage`, params)
-                    .then(function (res) {
-                        if (res.data.code === 1) {
-                            that.$message({
-                                type: 'success',
-                                message: res.data.msg
-                            })
-                            that.dialogFormVisible = false
-                            that.formLabelAlign = {}
-                            that.gettpl(1, 0)
-                        } else {
-                            that.$message({
-                                type: 'error',
-                                message: res.data.msg
-                            })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            },
-            //编辑确定
-            okFunction1() {
-                var that = this
-                var params = that.formLabelAlignEdit
-                params.token = "wch1228310"
-                axios.post(`${base.baseUrl}index.php/portal/old/editVillage`, params)
-                    .then(function (res) {
-                        if (res.data.code === 1) {
-                            that.$message({
-                                type: 'success',
-                                message: res.data.msg
-                            })
-                            that.dialogFormVisibleEdit = false
-                            that.formLabelAlignEdit = {}
-                            that.gettpl(1, 0)
-                        } else {
-                            that.$message({
-                                type: 'error',
-                                message: res.data.msg
-                            })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            },
-            //点击编辑
-            editFunction(index, row) {
-                var that = this
-                that.optionsNbc = []
-                that.formLabelAlignEdit = {}
-                that.formLabelAlignEdit = JSON.parse(JSON.stringify(row))
-                that.dialogFormVisibleEdit = true
-                for (let i = 0; i < this.options.length; i++) {
-                    if (that.options[i].street_name == that.formLabelAlignEdit.street_name) {
-                        that.formLabelAlignEdit.street_id = that.options[i].id
-                        that.getSelectNbc(that.formLabelAlignEdit.street_id, that.formLabelAlignEdit)
-                    }
-
-                }
-
-
-            },
             //删除
             deleteFunction(index, row) {
                 this.$confirm('此操作将永久删除此条数据, 是否继续?', '提示', {
@@ -263,7 +194,7 @@
                     type: 'warning'
                 }).then(() => {
                     let that = this
-                    var params = {id: row.id, token: "wch1228310"}
+                    var params = {id: row.id, token: sessionStorage.getItem("setToken")}
                     axios.post(`${base.baseUrl}index.php/portal/old/deleteVillage`, params)
                         .then(function (res) {
                             if (res.data.code === 1) {
@@ -298,14 +229,42 @@
                 var that = this
                 var params = {
                     page: page,
-                    token: "wch1228310",
+                    token: sessionStorage.getItem("setToken"),
                     type: type
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/villageList`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
                             that.tableData = res.data.data;
-                            that.tableData.length > 0 ? that.total = that.tableData.length : that.total = 0;
+                            that.total = res.data.count
+                        } else {
+                            that.total = 0;
+                            that.tableData = []
+                            that.$message({
+                                type: 'error',
+                                message: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            //新增确定
+            okFunction() {
+                var that = this
+                var params = this.formLabelAlign
+                params.token = sessionStorage.getItem("setToken")
+                axios.post(`${base.baseUrl}index.php/portal/old/addVillage`, params)
+                    .then(function (res) {
+                        if (res.data.code === 1) {
+                            that.$message({
+                                type: 'success',
+                                message: res.data.msg
+                            })
+                            that.dialogFormVisible = false
+                            that.formLabelAlign = {}
+                            that.gettpl(1, 0)
                         } else {
                             that.$message({
                                 type: 'error',
@@ -317,23 +276,80 @@
                         console.log(error);
                     });
             },
-            streetChange(id, formLabelAlign) {
+            //编辑确定
+            okFunction1() {
                 var that = this
-                this.getSelectNbc(id, formLabelAlign)
+                var params = that.formLabelAlignEdit
+                params.token = sessionStorage.getItem("setToken")
+                axios.post(`${base.baseUrl}index.php/portal/old/editVillage`, params)
+                    .then(function (res) {
+                        if (res.data.code === 1) {
+                            that.$message({
+                                type: 'success',
+                                message: res.data.msg
+                            })
+                            that.dialogFormVisibleEdit = false
+                            that.formLabelAlignEdit = {}
+                            that.gettpl(1, 0)
+                        } else {
+                            that.$message({
+                                type: 'error',
+                                message: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            //点击编辑
+            editFunction(index, row) {
+                var that = this
+                that.optionsNbc = []
+                that.formLabelAlignEdit = {}
+                that.dialogFormVisibleEdit = true
+                var params = {id: row.id, token: sessionStorage.getItem("setToken")}
+                axios.post(`${base.baseUrl}index.php/portal/old/getVillage`, params)
+                    .then(function (res) {
+                        if (res.data.code === 1) {
+                            that.formLabelAlignEdit = res.data.data
+                            var formLabelAlignEdit = JSON.parse(JSON.stringify(that.formLabelAlignEdit))
+                            that.getSelectNbc(that.formLabelAlignEdit.street_id,formLabelAlignEdit)
+                        } else {
+                            that.$message({
+                                type: 'error',
+                                message: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+
+            //选择街道时
+            streetChange(id, formLabelAlign) {
+                // formLabelAlign.nbc_id = null
+                this.getSelectNbc(id,formLabelAlign)
+            },
+            //选择居委会时
+            nbcChange(val) {
+                var formData = JSON.parse(JSON.stringify(this.formLabelAlignEdit))
+                this.$set(formData, formData.nbc_id, val)
             },
             //获取街道选项
             getSelect() {
                 var that = this
                 var params = {
-                    token: "wch1228310",
+                    token: sessionStorage.getItem("setToken"),
                     type: 1,
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/streetList`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
-                            res.data.data.length === 0 ?
-                                that.options = [] : that.options = res.data.data;
+                            that.options = res.data.data;
                         } else {
+                            that.options = []
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
@@ -346,9 +362,10 @@
             },
             //获取居委会选项
             getSelectNbc(street_id, formLabelAlign) {
+                formLabelAlign.nbc_id = null
                 var that = this
                 var params = {
-                    token: "wch1228310",
+                    token: sessionStorage.getItem("setToken"),
                     type: 1,
                     street_id: street_id
                 }
@@ -356,18 +373,14 @@
                     .then(function (res) {
                         if (res.data.code === 1) {
                             that.optionsNbc = res.data.data
-                            for (let j = 0; j < that.optionsNbc.length; j++) {
-                                if (that.optionsNbc[j].nbc_name == that.formLabelAlignEdit.nbc_name) {
-                                    that.formLabelAlignEdit.nbc_id = that.optionsNbc[j].id
-                                } else {
-                                    that.formLabelAlignEdit.nbc_id = null
+                            for (var j = 0; j < that.optionsNbc.length; j++) {
+                                if (that.optionsNbc[j].id === formLabelAlign.nbc_id) {
+                                    formLabelAlign.nbc_id = that.optionsNbc[j].id
                                 }
                             }
                         } else {
-                            if (res.data.data === "") {
-                                formLabelAlign.nbc_id = null
-                                that.optionsNbc = []
-                            }
+                            formLabelAlign.nbc_id = null
+                            that.optionsNbc = []
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
@@ -381,11 +394,11 @@
             //分页
             handleSizeChange(val) {
                 this.pageSize = val;
-                this.gettpl(this.pageSize, 1)
+                this.gettpl(this.pageSize)
             },
             handleCurrentChange(val) {
                 this.currentPage4 = val;
-                this.gettpl(this.currentPage4, 1)
+                this.gettpl(this.currentPage4)
             },
         },
         mounted() {

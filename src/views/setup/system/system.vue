@@ -49,9 +49,8 @@
                         @size-change="handleSizeChange"
                         @current-change="handleCurrentChange"
                         :current-page="currentPage4"
-                        :page-sizes="[10,20,30]"
                         :page-size="pageSize"
-                        layout="total, sizes, prev, pager, next, jumper"
+                        layout="total, prev, pager, next"
                         :total="total">
                 </el-pagination>
             </div>
@@ -126,7 +125,7 @@
                 input3: '',
                 select: '',
                 currentPage4: 1, /*分页*/
-                pageSize: 10,
+                pageSize: 20,
                 total: 0,
             };
         },
@@ -135,7 +134,7 @@
             okFunction() {
                 var that = this
                 var params = this.formLabelAlign
-                params.token = "wch1228310"
+                params.token = sessionStorage.getItem("setToken")
                 axios.post(`${base.baseUrl}index.php/portal/old/addStreet`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
@@ -161,7 +160,7 @@
             okFunction1() {
                 var that = this
                 var params = that.formLabelAlignEdit
-                params.token = "wch1228310"
+                params.token = sessionStorage.getItem("setToken")
                 axios.post(`${base.baseUrl}index.php/portal/old/editStreet`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
@@ -197,7 +196,7 @@
                     type: 'warning'
                 }).then(() => {
                     let that = this
-                    var params = {id: row.id,token:"wch1228310"}
+                    var params = {id: row.id,token:sessionStorage.getItem("setToken")}
                     axios.post(`${base.baseUrl}index.php/portal/old/deleteStreet`, params)
                         .then(function (res) {
                             console.log(res);
@@ -233,16 +232,18 @@
                 var that = this
                 var params = {
                     page: page,
-                    token: "wch1228310",
+                    token: sessionStorage.getItem("setToken"),
                     type: type
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/streetList`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
                             that.tableData = res.data.data;
-                            that.tableData.length > 0 ? that.total = that.tableData.length : that.total = 0;
+                            that.total = res.data.count
                         } else {
-                            that.$message({
+                            that.total = 0;
+                            that.tableData = []
+                                that.$message({
                                 type: 'error',
                                 message: res.data.msg
                             })
@@ -255,11 +256,11 @@
             //分页
             handleSizeChange(val) {
                 this.pageSize = val;
-                this.gettpl(this.pageSize, 1)
+                this.gettpl(this.pageSize)
             },
             handleCurrentChange(val) {
                 this.currentPage4 = val;
-                this.gettpl(this.currentPage4, 1)
+                this.gettpl(this.currentPage4)
             },
         },
         mounted() {

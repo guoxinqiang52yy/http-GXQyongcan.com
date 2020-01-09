@@ -32,7 +32,7 @@ const routers = new VueRouter({
                     path:"/setup",
                     name:'setup',
                     meta:{
-                        icon:'el-icon-edit',
+                        icon:'el-icon-bangzhu',
                         title:'行政管理'
                     },
                     component: ()=>import('@/views/setup/setup.vue'),
@@ -41,7 +41,7 @@ const routers = new VueRouter({
                             path: "/system",
                             name: 'system',
                             meta: {
-                                icon: 'el-icon-edit',
+                                icon: 'el-icon-office-building',
                                 title: '街道管理'
                             },
                             component: () => import('@/views/setup/system/system.vue')
@@ -50,7 +50,7 @@ const routers = new VueRouter({
                             path: "/payment",
                             name: 'payment',
                             meta: {
-                                icon: 'el-icon-finished',
+                                icon: 'el-icon-files',
                                 title: '居委会管理'
                             },
                             component: () => import('@/views/setup/payment/payment.vue')
@@ -59,7 +59,7 @@ const routers = new VueRouter({
                             path: "/jurisdiction",
                             name: 'jurisdiction',
                             meta: {
-                                icon: 'el-icon-coordinate',
+                                icon: 'el-icon-pie-chart',
                                 title: '小区管理'
                             },
                             component: () => import('@/views/setup/jurisdiction/jurisdiction.vue')
@@ -68,7 +68,7 @@ const routers = new VueRouter({
                             path: "/math",
                             name: 'math',
                             meta: {
-                                icon: 'el-icon-s-custom',
+                                icon: 'el-icon-coordinate',
                                 title: '用户管理'
                             },
                             component: () => import('@/views/setup/math/math.vue')
@@ -79,7 +79,7 @@ const routers = new VueRouter({
                     path:"/vips",
                     name:'vips',
                     meta:{
-                        icon:'el-icon-edit',
+                        icon:'el-icon-thumb',
                         title:'预定交费'
                     },
                     component: ()=>import('@/views/vips/vips.vue'),
@@ -88,7 +88,7 @@ const routers = new VueRouter({
                             path:'/vip',
                             name:'vip',
                             meta:{
-                                icon:'el-icon-trophy',
+                                icon:'el-icon-link',
                                 title:'缴费'
                             },
                             component: ()=>import('@/views/vips/vip/vip.vue')
@@ -97,7 +97,7 @@ const routers = new VueRouter({
                             path:'/vipdetails',
                             name:'vipdetails',
                             meta:{
-                                icon:'el-icon-trophy',
+                                icon:'el-icon-connection',
                                 title:'缴费情况管理'
                             },
                             component: ()=>import('@/views/vips/vipdetails/vipdetails.vue')
@@ -106,7 +106,7 @@ const routers = new VueRouter({
                             path:'/fooddetails',
                             name:'fooddetails',
                             meta:{
-                                icon:'el-icon-trophy',
+                                icon:'el-icon-present',
                                 title:'订餐情况'
                             },
                             component: ()=>import('@/views/vips/fooddetails/fooddetails.vue')
@@ -117,19 +117,37 @@ const routers = new VueRouter({
                     path:'/foodout',
                     name:'foodout',
                     meta:{
-                        icon:'el-icon-trophy',
+                        icon:'el-icon-tableware',
                         title:'取餐管理'
                     },
                     component: ()=>import('@/views/foodout/foodout.vue')
                 },
                 {
+                    path:'/foodoutReyurn',
+                    name:'foodoutReyurn',
+                    meta:{
+                        icon:'el-icon-tickets',
+                        title:'后厨配餐管理'
+                    },
+                    component: ()=>import('@/views/foodoutReyurn/foodoutReyurn.vue')
+                },
+                {
                     path:'/recom',
                     name:'recom',
                     meta:{
-                        icon:'el-icon-trophy',
-                        title:'月统计表'
+                        icon:'el-icon-document-copy',
+                        title:'月汇报表'
                     },
                     component: ()=>import('@/views/recom/recom.vue')
+                },
+                {
+                    path:'/recomDetails',
+                    name:'recomDetails',
+                    meta:{
+                        icon:'el-icon-document',
+                        title:'月统计表'
+                    },
+                    component: ()=>import('@/views/recomDetails/recomDetails.vue')
                 },
                 {
                     path:'/updatepas',

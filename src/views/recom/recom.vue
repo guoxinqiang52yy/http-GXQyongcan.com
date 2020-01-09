@@ -4,7 +4,7 @@
         <!--卡片-->
         <el-card class="box-card">
             <div slot="header" class="clearfix">
-                <span>月统计表</span>
+                <span>月汇报表</span>
             </div>
             <div style="width: 100%;">
                 <el-form :rules="rules" :inline="true" :model="formLabelAlign" class="report_demo_form">
@@ -18,7 +18,7 @@
                             </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item prop="village_id" label="小区：" size="medium" style="width:30%">
+                    <el-form-item class="foodout1" prop="village_id" label="小区：" size="medium" style="width:30%">
                         <el-cascader
                                 placeholder="街道/居委会/小区"
                                 v-model="formLabelAlign.village_id"
@@ -26,6 +26,7 @@
                                 @change="handleChange"
                                 :props="props">
                         </el-cascader>
+                        <el-input :disabled="true" class="formLabelAlign" v-model="formLabelAlign.village_id"></el-input>
                     </el-form-item>
                     <el-row class="myReportD">
                         <el-col :span="20" style="border: none;">
@@ -83,17 +84,32 @@
             //领取表
             editClickUp() {
                 var params = this.formLabelAlign
-                var a = document.createElement('a')
-                a.href = `${base.baseUrl}index.php/portal/order/excelByMonth?month=${params.month}&village_id=${params.village_ids}&token=${"wch1228310"}`
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                if (params.village_ids != "" && params.month != "") {
+                    var a = document.createElement('a')
+                    a.href = `${base.baseUrl}index.php/portal/order/excelByMonth?month=${params.month}&village_id=${params.village_ids}&token=${sessionStorage.getItem("setToken")}`
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    if (params.village_ids == ""){
+                        this.$message({
+                            type: 'info',
+                            message: "请选择小区"
+                        })
+                    }
+                    if (params.month == ""){
+                        this.$message({
+                            type: 'info',
+                            message: "请选择时间"
+                        })
+                    }
+                }
             },
             //获取月份
             getSelect() {
                 var that = this
                 var params = {
-                    token: "wch1228310",
+                    token: sessionStorage.getItem("setToken"),
                     type: 1,
                 }
                 axios.post(`${base.baseUrl}index.php/portal/order/getMonth`, params)
@@ -114,6 +130,7 @@
             },
             //级联选择器
             handleChange(value) {
+                this.formLabelAlign.village_id = value.join("/")
                 if (this.childArray.length > 0) {
                     for (var i = 0; i < this.childArray.length; i++) {
                         if (this.childArray[i].length > 0) {
@@ -130,7 +147,7 @@
             getSelect1() {
                 var that = this
                 var params = {
-                    token: "wch1228310",
+                    token: sessionStorage.getItem("setToken"),
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/getList`, params)
                     .then(function (res) {
@@ -186,7 +203,20 @@
 
                 }
             }
-
+            .el-button--primary {
+                height: 30px;
+                padding: 0 10px;
+                background: linear-gradient(90deg, rgba(96, 157, 248, 1), rgba(84, 183, 235, 1));
+            }
+            .foodout1{
+                position: relative;
+            }
+            .foodout1 .formLabelAlign{
+                position: absolute;
+                left: 0;
+                top:0;
+                width: 80%;
+            }
             .el-select .el-input {
                 width: 130px;
             }

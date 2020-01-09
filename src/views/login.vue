@@ -40,6 +40,8 @@
 </template>
 
 <script>
+    import base from '@/api/base'
+    import axios from "axios";
     export default {
         name: "login",
         data() {
@@ -62,7 +64,28 @@
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.$router.push('/index');
+                        var that = this
+                        var params = {
+                            user_login:that.ruleForm.username,
+                            user_pass:that.ruleForm.password
+                        }
+                        axios.post(`${base.baseUrl}index.php/portal/user/login`, params)
+                            .then(function (res) {
+                                if (res.data.code == 1) {
+                                    var setToken = res.data.data.token
+                                    var navList = JSON.parse(JSON.stringify(res.data.data))
+                                    that.$store.state.navList = navList
+                                    sessionStorage.setItem("setToken",setToken)
+                                    that.$message.success("登录成功")
+                                    that.$router.push('/index');
+                                } else {
+                                    that.$message.success(res.data.msg)
+                                }
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+
                     } else {
                         this.$message.error("登录失败")
                     }

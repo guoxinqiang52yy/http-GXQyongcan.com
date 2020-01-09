@@ -85,9 +85,8 @@
                         @size-change="handleSizeChange"
                         @current-change="handleCurrentChange"
                         :current-page="currentPage4"
-                        :page-sizes="[10,20,30]"
                         :page-size="pageSize"
-                        layout="total, sizes, prev, pager, next, jumper"
+                        layout="total, prev, pager, next"
                         :total="total">
                 </el-pagination>
             </div>
@@ -97,7 +96,7 @@
             <el-form label-width="100px" :model="formLabelAlign">
                 <el-form-item label="所在街道">
                     <el-select v-model="formLabelAlign.street_id" placeholder="请选择"
-                               @change="streetChange(formLabelAlign.street_id)">
+                               @change="streetChange(formLabelAlign.street_id,JSON.parse(JSON.stringify(formLabelAlign)))">
                         <el-option
                                 v-for="item in options"
                                 :key="item.id"
@@ -108,7 +107,7 @@
                 </el-form-item>
                 <el-form-item label="所在居委会">
                     <el-select v-model="formLabelAlign.nbc_id" placeholder="请选择"
-                               @change="nbcChange(formLabelAlign.nbc_id)">
+                               @change="nbcChange(formLabelAlign.nbc_id,JSON.parse(JSON.stringify(formLabelAlign)))">
                         <el-option
                                 v-for="item in optionsNbc"
                                 :key="item.id"
@@ -141,25 +140,11 @@
                     <el-input v-model="formLabelAlign.user_name"></el-input>
                 </el-form-item>
                 <el-form-item label="身份证号">
-                    <el-input v-model="formLabelAlign.card_number"></el-input>
-                </el-form-item>
-                <el-form-item label="年龄">
-                    <el-input v-model="formLabelAlign.age"></el-input>
-                </el-form-item>
-                <el-form-item label="性别">
-                    <el-select v-model="formLabelAlign.sex" placeholder="请选择">
-                        <el-option
-                                v-for="item in optionsSex"
-                                :key="item.id"
-                                :label="item.sex_name"
-                                :value="item.id">
-                        </el-option>
-                    </el-select>
+                    <el-input type="number" v-model="formLabelAlign.card_number"></el-input>
                 </el-form-item>
                 <el-form-item label="电话">
-                    <el-input v-model="formLabelAlign.mobile"></el-input>
+                    <el-input type="number" v-model="formLabelAlign.mobile"></el-input>
                 </el-form-item>
-
                 <el-form-item label="户籍住址">
                     <el-input v-model="formLabelAlign.address"></el-input>
                 </el-form-item>
@@ -167,7 +152,7 @@
                     <el-input v-model="formLabelAlign.now_address"></el-input>
                 </el-form-item>
                 <el-form-item label="银行卡号">
-                    <el-input placeholder="社保卡" v-model="formLabelAlign.bank_card"></el-input>
+                    <el-input type="number" placeholder="社保卡" v-model="formLabelAlign.bank_card"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -180,7 +165,7 @@
             <el-form label-width="100px" :model="formLabelAlignEdit">
                 <el-form-item label="所在街道">
                     <el-select v-model="formLabelAlignEdit.street_id" placeholder="请选择"
-                               @change="streetChange(formLabelAlignEdit.street_id)">
+                               @change="streetChange(formLabelAlignEdit.street_id,JSON.parse(JSON.stringify(formLabelAlignEdit)))">
                         <el-option
                                 v-for="item in options"
                                 :key="item.id"
@@ -191,7 +176,7 @@
                 </el-form-item>
                 <el-form-item label="所在居委会">
                     <el-select v-model="formLabelAlignEdit.nbc_id" placeholder="请选择"
-                               @change="nbcChange(formLabelAlignEdit.nbc_id)">
+                               @change="nbcChange(formLabelAlignEdit.nbc_id,JSON.parse(JSON.stringify(formLabelAlignEdit)))">
                         <el-option
                                 v-for="item in optionsNbc"
                                 :key="item.id"
@@ -201,7 +186,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所在小区">
-                    <el-select v-model="formLabelAlignEdit.village_id" placeholder="请选择">
+                    <el-select v-model="formLabelAlignEdit.village_id" placeholder="请选择" @change="villageChange">
                         <el-option
                                 v-for="item in optionsVill"
                                 :key="item.id"
@@ -224,23 +209,10 @@
                     <el-input v-model="formLabelAlignEdit.user_name"></el-input>
                 </el-form-item>
                 <el-form-item label="身份证号">
-                    <el-input v-model="formLabelAlignEdit.card_number"></el-input>
-                </el-form-item>
-                <el-form-item label="年龄">
-                    <el-input v-model="formLabelAlignEdit.age"></el-input>
-                </el-form-item>
-                <el-form-item label="性别">
-                    <el-select v-model="formLabelAlignEdit.sex" placeholder="请选择">
-                        <el-option
-                                v-for="item in optionsSex"
-                                :key="item.id"
-                                :label="item.sex_name"
-                                :value="item.id">
-                        </el-option>
-                    </el-select>
+                    <el-input type="number" v-model="formLabelAlignEdit.card_number"></el-input>
                 </el-form-item>
                 <el-form-item label="电话">
-                    <el-input v-model="formLabelAlignEdit.mobile"></el-input>
+                    <el-input type="number" v-model="formLabelAlignEdit.mobile"></el-input>
                 </el-form-item>
                 <el-form-item label="户籍住址">
                     <el-input v-model="formLabelAlignEdit.address"></el-input>
@@ -249,7 +221,7 @@
                     <el-input v-model="formLabelAlignEdit.now_address"></el-input>
                 </el-form-item>
                 <el-form-item label="银行卡号">
-                    <el-input placeholder="社保卡" v-model="formLabelAlignEdit.bank_card"></el-input>
+                    <el-input type="number" placeholder="社保卡" v-model="formLabelAlignEdit.bank_card"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -306,16 +278,10 @@
                     <el-input v-model="formLabelAlignDetails.user_name"></el-input>
                 </el-form-item>
                 <el-form-item label="身份证号">
-                    <el-input v-model="formLabelAlignDetails.card_number"></el-input>
-                </el-form-item>
-                <el-form-item label="年龄">
-                    <el-input v-model="formLabelAlignDetails.age"></el-input>
-                </el-form-item>
-                <el-form-item label="性别">
-                    <el-input v-model="formLabelAlignDetails.sex"></el-input>
+                    <el-input type="number" v-model="formLabelAlignDetails.card_number"></el-input>
                 </el-form-item>
                 <el-form-item label="电话">
-                    <el-input v-model="formLabelAlignDetails.mobile"></el-input>
+                    <el-input type="number" v-model="formLabelAlignDetails.mobile"></el-input>
                 </el-form-item>
                 <el-form-item label="户籍住址">
                     <el-input v-model="formLabelAlignDetails.address"></el-input>
@@ -324,7 +290,7 @@
                     <el-input v-model="formLabelAlignDetails.now_address"></el-input>
                 </el-form-item>
                 <el-form-item label="银行卡号">
-                    <el-input placeholder="社保卡" v-model="formLabelAlignDetails.bank_card"></el-input>
+                    <el-input type="number" placeholder="社保卡" v-model="formLabelAlignDetails.bank_card"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -348,12 +314,10 @@
             return {
                 activeName: '1',
                 formLabelAlign: {
-                    street_id: '',
-                    village_id: '',
-                    nbc_id: '',
+                    street_id: null,
+                    village_id: null,
+                    nbc_id: null,
                     user_name: '',
-                    age: '',
-                    sex: '',
                     card_number: '',
                     bank_card: '',
                     address: '',
@@ -379,136 +343,12 @@
                 optionsType: [
                     {id: 0, type_name: "普通"}, {id: 1, type_name: "高龄"}, {id: 2, type_name: "残疾"},{id: 3, type_name: "困难"}
                 ],
-                optionsSex:[{id:0,sex_name:"男"},{id:1,sex_name:"女"}],
                 currentPage4: 1, /*分页*/
-                pageSize: 10,
+                pageSize: 20,
                 total: 0,
             }
         },
         methods: {
-            //详情确定
-            okFunction2() {
-                let that = this
-                that.dialogFormVisibleDetails = false
-            },
-            //详情
-            detailsFunction(index, row) {
-                let that = this
-                that.dialogFormVisibleDetails = true
-                var params = {id: row.id, token: "wch1228310"}
-                axios.post(`${base.baseUrl}index.php/portal/old/getUser`, params)
-                    .then(function (res) {
-                        if (res.data.code === 1) {
-                            that.formLabelAlignDetails = res.data.data
-                            that.getSelectNbc(that.formLabelAlignDetails.street_id)
-                            for (var j = 0; j < that.optionsNbc.length; j++) {
-                                if (that.optionsNbc[j].id === that.formLabelAlignDetails.nbc_id) {
-                                    that.formLabelAlignDetails.nbc_id = that.optionsNbc[j].id
-                                    that.getSelectVill(that.formLabelAlignDetails.nbc_id)
-                                }
-                            }
-                            for (var a = 0; a < that.optionsVill.length; a++) {
-                                if (that.optionsVill[a].id === that.formLabelAlignDetails.village_id) {
-                                    that.formLabelAlignDetails.village_id = that.optionsVill[a].id
-                                }
-                            }
-                        } else {
-                            that.$message({
-                                type: 'error',
-                                message: res.data.msg
-                            })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            },
-            //新增确定
-            okFunction() {
-                var that = this
-                var params = this.formLabelAlign
-                params.token = "wch1228310"
-                axios.post(`${base.baseUrl}index.php/portal/old/addUser`, params)
-                    .then(function (res) {
-                        if (res.data.code === 1) {
-                            that.$message({
-                                type: 'success',
-                                message: res.data.msg
-                            })
-                            that.dialogFormVisible = false
-                            that.formLabelAlign = {}
-                            that.gettpl(1, 0)
-                        } else {
-                            that.$message({
-                                type: 'error',
-                                message: res.data.msg
-                            })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            },
-            //编辑确定
-            okFunction1() {
-                var that = this
-                var params = that.formLabelAlignEdit
-                params.token = "wch1228310"
-
-                axios.post(`${base.baseUrl}index.php/portal/old/editUser`, params)
-                    .then(function (res) {
-                        if (res.data.code === 1) {
-                            that.$message({
-                                type: 'success',
-                                message: res.data.msg
-                            })
-                            that.dialogFormVisibleEdit = false
-                            that.formLabelAlignEdit = {}
-                            that.gettpl(1, 0)
-                        } else {
-                            that.$message({
-                                type: 'error',
-                                message: res.data.msg
-                            })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            },
-            //点击编辑
-            editFunction(index, row) {
-                let that = this
-                that.dialogFormVisibleEdit = true
-                var params = {id: row.id, token: "wch1228310"}
-                axios.post(`${base.baseUrl}index.php/portal/old/getUser`, params)
-                    .then(function (res) {
-                        if (res.data.code === 1) {
-                            that.formLabelAlignEdit = res.data.data
-                            console.log(that.formLabelAlignEdit);
-                            that.getSelectNbc(that.formLabelAlignEdit.street_id)
-                            for (var j = 0; j < that.optionsNbc.length; j++) {
-                                if (that.optionsNbc[j].id === that.formLabelAlignEdit.nbc_id) {
-                                    that.formLabelAlignEdit.nbc_id = that.optionsNbc[j].id
-                                }
-                            }
-                            that.getSelectVill(that.formLabelAlignEdit.nbc_id)
-                            for (var a = 0; a < that.optionsVill.length; a++) {
-                                if (that.optionsVill[a].id === that.formLabelAlignEdit.village_id) {
-                                    that.formLabelAlignEdit.village_id = that.optionsVill[a].id
-                                }
-                            }
-                        } else {
-                            that.$message({
-                                type: 'error',
-                                message: res.data.msg
-                            })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            },
             //删除
             deleteFunction(index, row) {
                 this.$confirm('此操作将永久删除此条数据, 是否继续?', '提示', {
@@ -517,7 +357,7 @@
                     type: 'warning'
                 }).then(() => {
                     let that = this
-                    var params = {id: row.id, token: "wch1228310"}
+                    var params = {id: row.id, token: sessionStorage.getItem("setToken")}
                     axios.post(`${base.baseUrl}index.php/portal/old/deleteUser`, params)
                         .then(function (res) {
                             if (res.data.code === 1) {
@@ -552,14 +392,97 @@
                 var that = this
                 var params = {
                     page: page,
-                    token: "wch1228310",
+                    token: sessionStorage.getItem("setToken"),
                     type: type
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/userList`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
                             that.tableData = res.data.data;
-                            that.tableData.length > 0 ? that.total = that.tableData.length : that.total = 0;
+                            that.total = res.data.count
+                        } else {
+                            that.total = 0;
+                            that.tableData = []
+                            that.$message({
+                                type: 'error',
+                                message: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            //详情确定
+            okFunction2() {
+                let that = this
+                that.dialogFormVisibleDetails = false
+            },
+            //详情
+            detailsFunction(index, row) {
+                let that = this
+                that.dialogFormVisibleDetails = true
+                var params = {id: row.id, token: sessionStorage.getItem("setToken")}
+                axios.post(`${base.baseUrl}index.php/portal/old/getUser`, params)
+                    .then(function (res) {
+                        if (res.data.code === 1) {
+                            that.formLabelAlignDetails = res.data.data
+                            var formLabelAlignEdit = JSON.parse(JSON.stringify(that.formLabelAlignDetails))
+                            that.getSelectNbc(that.formLabelAlignDetails.street_id,formLabelAlignEdit)
+                            that.getSelectVill(that.formLabelAlignDetails.nbc_id,formLabelAlignEdit)
+                        } else {
+                            that.$message({
+                                type: 'error',
+                                message: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            //新增确定
+            okFunction() {
+                var that = this
+                var params = this.formLabelAlign
+                params.token = sessionStorage.getItem("setToken")
+                axios.post(`${base.baseUrl}index.php/portal/old/addUser`, params)
+                    .then(function (res) {
+                        if (res.data.code === 1) {
+                            that.$message({
+                                type: 'success',
+                                message: res.data.msg
+                            })
+                            that.dialogFormVisible = false
+                            that.formLabelAlign = {}
+                            that.gettpl(1, 0)
+                        } else {
+                            that.$message({
+                                type: 'error',
+                                message: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            //编辑确定
+            okFunction1() {
+                var that = this
+                var params = that.formLabelAlignEdit
+                params.token = sessionStorage.getItem("setToken")
+
+                axios.post(`${base.baseUrl}index.php/portal/old/editUser`, params)
+                    .then(function (res) {
+                        if (res.data.code === 1) {
+                            that.$message({
+                                type: 'success',
+                                message: res.data.msg
+                            })
+                            that.dialogFormVisibleEdit = false
+                            that.formLabelAlignEdit = {}
+                            that.gettpl(1, 0)
                         } else {
                             that.$message({
                                 type: 'error',
@@ -572,27 +495,58 @@
                     });
             },
 
+            //点击编辑
+            editFunction(index, row) {
+                let that = this
+                that.dialogFormVisibleEdit = true
+                var params = {id: row.id, token: sessionStorage.getItem("setToken")}
+                axios.post(`${base.baseUrl}index.php/portal/old/getUser`, params)
+                    .then(function (res) {
+                        if (res.data.code === 1) {
+                            that.formLabelAlignEdit = res.data.data
+                            var formLabelAlignEdit = JSON.parse(JSON.stringify(that.formLabelAlignEdit))
+                            that.getSelectNbc(that.formLabelAlignEdit.street_id,formLabelAlignEdit)
+                            that.getSelectVill(that.formLabelAlignEdit.nbc_id,formLabelAlignEdit)
+
+                        } else {
+                            that.$message({
+                                type: 'error',
+                                message: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
             //选择街道时
-            streetChange(id) {
-                this.getSelectNbc(id)
+            streetChange(id,formLabelAlignEdit) {
+                this.getSelectNbc(id,formLabelAlignEdit)
             },
             //选择居委会时
-            nbcChange(id) {
-                this.getSelectVill(id)
+            nbcChange(id,formLabelAlignEdit) {
+                var formData = JSON.parse(JSON.stringify(formLabelAlignEdit))
+                this.$set(formData, formData.nbc_id, id)
+                this.getSelectVill(id,formLabelAlignEdit)
+            },
+            //选择小区时
+            villageChange(val) {
+                var formData = JSON.parse(JSON.stringify(this.formLabelAlignEdit))
+                this.$set(formData, formData.village_id, val)
             },
             //获取街道选项
             getSelect() {
                 var that = this
                 var params = {
-                    token: "wch1228310",
+                    token: sessionStorage.getItem("setToken"),
                     type: 1,
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/streetList`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
-                            res.data.data.length === 0 ?
-                                that.options = [] : that.options = res.data.data;
+                            that.options = res.data.data;
                         } else {
+                            that.options = []
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
@@ -605,10 +559,11 @@
             },
 
             //获取居委会选项
-            getSelectNbc(street_id) {
+            getSelectNbc(street_id,formLabelAlignEdit) {
+                formLabelAlignEdit.nbc_id = null
                 var that = this
                 var params = {
-                    token: "wch1228310",
+                    token: sessionStorage.getItem("setToken"),
                     type: 1,
                     street_id: street_id
                 }
@@ -616,11 +571,14 @@
                     .then(function (res) {
                         if (res.data.code === 1) {
                             that.optionsNbc = res.data.data;
-                        } else {
-                            if (res.data.data === "") {
-                                that.formLabelAlign.nbc_id = ''
-                                that.optionsNbc = []
+                            for (var j = 0; j < that.optionsNbc.length; j++) {
+                                if (that.optionsNbc[j].id === formLabelAlignEdit.nbc_id) {
+                                    formLabelAlignEdit.nbc_id = that.optionsNbc[j].id
+                                }
                             }
+                        } else {
+                            formLabelAlignEdit.nbc_id = null
+                            that.optionsNbc = []
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
@@ -632,10 +590,11 @@
                     });
             },
             //获取小区选项
-            getSelectVill(nbc_id) {
+            getSelectVill(nbc_id,formLabelAlignEdit) {
+                formLabelAlignEdit.village_id = null
                 var that = this
                 var params = {
-                    token: "wch1228310",
+                    token: sessionStorage.getItem("setToken"),
                     type: 1,
                     nbc_id: nbc_id
                 }
@@ -643,11 +602,14 @@
                     .then(function (res) {
                         if (res.data.code === 1) {
                             that.optionsVill = res.data.data;
-                        } else {
-                            if (res.data.data === "") {
-                                that.formLabelAlign.village_id = ''
-                                that.optionsVill = []
+                            for (var a = 0; a < that.optionsVill.length; a++) {
+                                if (that.optionsVill[a].id === formLabelAlignEdit.village_id) {
+                                    formLabelAlignEdit.village_id = that.optionsVill[a].id
+                                }
                             }
+                        } else {
+                            formLabelAlignEdit.village_id = null
+                            that.optionsVill = []
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
@@ -661,11 +623,11 @@
             //分页
             handleSizeChange(val) {
                 this.pageSize = val;
-                this.gettpl(this.pageSize, 1)
+                this.gettpl(this.pageSize)
             },
             handleCurrentChange(val) {
                 this.currentPage4 = val;
-                this.gettpl(this.currentPage4, 1)
+                this.gettpl(this.currentPage4)
             },
         },
         mounted() {
