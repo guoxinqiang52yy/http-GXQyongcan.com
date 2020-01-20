@@ -29,7 +29,7 @@
                                 </el-date-picker>
                             </el-form-item>
                             <el-form-item class="foodout1" label="小区：" size="medium" style=""
-                                          prop="village_id">
+                                          >
                                 <el-cascader
                                         placeholder="街道/居委会/小区"
                                         v-model="formInline.village_id"
@@ -38,7 +38,8 @@
                                         :props="props">
                                 </el-cascader>
                                 <el-input :disabled="true" class="formLabelAlign"
-                                          v-model="formInline.village_id"></el-input>
+                                          v-model="formInline.village_id" prop="village_id">
+                                </el-input>
                             </el-form-item>
                             <el-row class="myReportD">
                                 <el-col :span="20" style="border: none;">
@@ -130,6 +131,14 @@
                         <el-option label="堂食" value="2"></el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item label="备注">
+                    <el-input
+                            type="textarea"
+                            :rows="2"
+                            placeholder="请输入内容"
+                            v-model="formLabelAlign.remark">
+                    </el-input>
+                </el-form-item>
                 <el-form-item label="日期选择器">
                     <el-date-picker
                             type="dates"
@@ -184,7 +193,8 @@
                     send_type: '',
                     send_date: [],
                     user_id: '',
-                    pay_status:''
+                    pay_status:'',
+                    remark:''
                 },/*缴费表单数据*/
                 multipleSelection: [],
                 childArray: [],
@@ -525,7 +535,6 @@
         left: 0;
         top: 0;
         width: 80% !important;
-
     }
 
     .report_demo_form .el-form--inline .el-form-item {

@@ -72,11 +72,11 @@
                         axios.post(`${base.baseUrl}index.php/portal/user/login`, params)
                             .then(function (res) {
                                 if (res.data.code == 1) {
+                                    that.$message.success("登录成功")
                                     var setToken = res.data.data.token
                                     var navList = JSON.parse(JSON.stringify(res.data.data))
                                     that.$store.state.navList = navList
                                     sessionStorage.setItem("setToken",setToken)
-                                    that.$message.success("登录成功")
                                     that.$router.push('/index');
                                 } else {
                                     that.$message.success(res.data.msg)

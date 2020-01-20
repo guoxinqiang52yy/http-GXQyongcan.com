@@ -5,9 +5,31 @@
             <div slot="header" class="clearfix">
                 <span>小区管理</span>
             </div>
-            <el-button type="primary" icon="el-icon-circle-plus-outline" @click="dialogFormVisible = true" class="aaa"
+            <el-form label-width="80px" :inline="true" :model="formInline"
+                                 class="report_demo_form">
+                            <el-form-item label="小区名称" size="medium" style="width:30%">
+                                <el-input v-model="formInline.village_name"
+                                          @keyup.enter.native="searchEnterFun"></el-input>
+                            </el-form-item>
+                            
+                            <el-row class="myReportD">
+                                <el-col :span="20" style="border: none;">
+                                    <div class="grid-content bg-purple">
+                                        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="dialogFormVisible = true" class="aaa"
                        size="small">添加小区
-            </el-button>
+                                        </el-button>
+                                    </div>
+                                </el-col>
+                                <el-col :span="4" style="border: none">
+                                    <div class="grid-content bg-purple">
+                                        <el-button style="float: right" size="mini" type="primary"
+                                                   @click="onSubmit()">查询
+                                        </el-button>
+                                    </div>
+                                </el-col>
+                            </el-row>
+                        </el-form>
+            
             <!--表格-->
             <el-table
                     :cell-style="cellStyle"
@@ -79,7 +101,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所在居委会">
-                    <el-select v-model="formLabelAlign.nbc_id" placeholder="请选择">
+                    <el-select filterable v-model="formLabelAlign.nbc_id" placeholder="请选择">
                         <el-option
                                 v-for="item in optionsNbc"
                                 :key="item.id"
@@ -120,7 +142,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所在居委会">
-                    <el-select v-model="formLabelAlignEdit.nbc_id" placeholder="请选择"
+                    <el-select filterable v-model="formLabelAlignEdit.nbc_id" placeholder="请选择"
                                @change="nbcChange">
                         <el-option
                                 v-for="item in optionsNbc"
@@ -162,6 +184,9 @@
         data() {
             return {
                 activeName: '1',
+                formInline:{
+                    village_name:""
+                },
                 formLabelAlign: {
                     village_name: '',
                     remark: '',
@@ -230,7 +255,8 @@
                 var params = {
                     page: page,
                     token: sessionStorage.getItem("setToken"),
-                    type: type
+                    type: type,
+                    village_name:that.formInline.village_name
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/villageList`, params)
                     .then(function (res) {
@@ -400,6 +426,17 @@
                 this.currentPage4 = val;
                 this.gettpl(this.currentPage4)
             },
+            //回车查询
+            searchEnterFun(e) {
+                var keyCode = window.event ? e.keyCode : e.which;
+                if (keyCode == 13) {
+                    this.onSubmit()
+                }
+            },
+            // 点击查询
+            onSubmit() {
+                this.gettpl(1)
+            },
         },
         mounted() {
             this.gettpl(1, 0)
@@ -434,6 +471,7 @@
             }
 
             .el-button--primary {
+                margin-bottom: 20px;
                 height: 30px;
                 padding: 0 10px;
                 background: linear-gradient(90deg, rgba(96, 157, 248, 1), rgba(84, 183, 235, 1));
@@ -454,11 +492,7 @@
                 }
             }
 
-            .el-input {
-                width: 40%;
-                float: right;
-                margin-top: 20px;
-            }
+           
 
             .operation {
                 .el-icon-thumb {

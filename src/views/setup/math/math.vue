@@ -5,8 +5,49 @@
             <div slot="header" class="clearfix">
                 <span>用户管理</span>
             </div>
-            <el-button type="primary" icon="el-icon-circle-plus-outline" @click="dialogFormVisible = true" class="aaa" size="small">添加用户
-            </el-button>
+            <el-form label-width="80px" :inline="true" :model="formInline"
+                                 class="report_demo_form">
+                            <el-form-item label="用户名" size="medium" style="width:19%">
+                                <el-input type="text" v-model="formInline.user_name"
+                                          @keyup.enter.native="searchEnterFun"></el-input>
+                            </el-form-item>
+                            <el-form-item label="手机号" size="medium" style="width:19%">
+                                <el-input type="number" v-model="formInline.mobile"
+                                          @keyup.enter.native="searchEnterFun"></el-input>
+                            </el-form-item>
+                            <el-form-item label="生日" size="medium" style="width:19%">
+                                <el-input type="text" placeholder="格式 (11月21日)" v-model="formInline.birth"
+                                          @keyup.enter.native="searchEnterFun"></el-input>
+                            </el-form-item>
+                            <el-form-item class="foodout1" label="小区：" size="medium" style=""
+                                          >
+                                <el-cascader
+                                        clearable
+                                        :props="props"
+                                        placeholder="街道/居委会/小区"
+                                        v-model="formInline.village_id"
+                                        :options="options"
+                                        @change="handleChange">
+                                </el-cascader>
+                                <el-input :disabled="true" class="formLabelAlign"
+                                          v-model="formInline.village_id">
+                                </el-input>
+                            </el-form-item>
+                            <el-row class="myReportD">
+                                <el-col :span="20" style="border: none;">
+                                    <div class="grid-content bg-purple">
+                                        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="dialogFormVisible = true" class="aaa" size="small">添加用户</el-button>
+                                    </div>
+                                </el-col>
+                                <el-col :span="4" style="border: none">
+                                    <div class="grid-content bg-purple">
+                                        <el-button style="float: right" size="mini" type="primary"
+                                                   @click="onSubmit()">查询
+                                        </el-button>
+                                    </div>
+                                </el-col>
+                            </el-row>
+                        </el-form>
             <!--表格-->
             <el-table
                     :cell-style="cellStyle"
@@ -39,6 +80,10 @@
                 <el-table-column
                         prop="mobile"
                         label="电话">
+                </el-table-column>
+                <el-table-column
+                        prop="birth"
+                        label="生日">
                 </el-table-column>
                 <el-table-column
                         prop="card_number"
@@ -98,7 +143,7 @@
                     <el-select v-model="formLabelAlign.street_id" placeholder="请选择"
                                @change="streetChange(formLabelAlign.street_id,JSON.parse(JSON.stringify(formLabelAlign)))">
                         <el-option
-                                v-for="item in options"
+                                v-for="item in optionsV"
                                 :key="item.id"
                                 :label="item.street_name"
                                 :value="item.id">
@@ -106,7 +151,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所在居委会">
-                    <el-select v-model="formLabelAlign.nbc_id" placeholder="请选择"
+                    <el-select filterable v-model="formLabelAlign.nbc_id" placeholder="请选择"
                                @change="nbcChange(formLabelAlign.nbc_id,JSON.parse(JSON.stringify(formLabelAlign)))">
                         <el-option
                                 v-for="item in optionsNbc"
@@ -117,7 +162,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所在小区">
-                    <el-select v-model="formLabelAlign.village_id" placeholder="请选择">
+                    <el-select filterable v-model="formLabelAlign.village_id" placeholder="请选择">
                         <el-option
                                 v-for="item in optionsVill"
                                 :key="item.id"
@@ -140,7 +185,7 @@
                     <el-input v-model="formLabelAlign.user_name"></el-input>
                 </el-form-item>
                 <el-form-item label="身份证号">
-                    <el-input type="number" v-model="formLabelAlign.card_number"></el-input>
+                    <el-input type="text" v-model="formLabelAlign.card_number"></el-input>
                 </el-form-item>
                 <el-form-item label="电话">
                     <el-input type="number" v-model="formLabelAlign.mobile"></el-input>
@@ -167,7 +212,7 @@
                     <el-select v-model="formLabelAlignEdit.street_id" placeholder="请选择"
                                @change="streetChange(formLabelAlignEdit.street_id,JSON.parse(JSON.stringify(formLabelAlignEdit)))">
                         <el-option
-                                v-for="item in options"
+                                v-for="item in optionsV"
                                 :key="item.id"
                                 :label="item.street_name"
                                 :value="item.id">
@@ -175,7 +220,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所在居委会">
-                    <el-select v-model="formLabelAlignEdit.nbc_id" placeholder="请选择"
+                    <el-select filterable v-model="formLabelAlignEdit.nbc_id" placeholder="请选择"
                                @change="nbcChange(formLabelAlignEdit.nbc_id,JSON.parse(JSON.stringify(formLabelAlignEdit)))">
                         <el-option
                                 v-for="item in optionsNbc"
@@ -186,7 +231,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所在小区">
-                    <el-select v-model="formLabelAlignEdit.village_id" placeholder="请选择" @change="villageChange">
+                    <el-select filterable v-model="formLabelAlignEdit.village_id" placeholder="请选择" @change="villageChange">
                         <el-option
                                 v-for="item in optionsVill"
                                 :key="item.id"
@@ -209,7 +254,7 @@
                     <el-input v-model="formLabelAlignEdit.user_name"></el-input>
                 </el-form-item>
                 <el-form-item label="身份证号">
-                    <el-input type="number" v-model="formLabelAlignEdit.card_number"></el-input>
+                    <el-input type="text" v-model="formLabelAlignEdit.card_number"></el-input>
                 </el-form-item>
                 <el-form-item label="电话">
                     <el-input type="number" v-model="formLabelAlignEdit.mobile"></el-input>
@@ -236,7 +281,7 @@
                     <el-select v-model="formLabelAlignDetails.street_id" placeholder="请选择"
                                @change="streetChange(formLabelAlignDetails.street_id)">
                         <el-option
-                                v-for="item in options"
+                                v-for="item in optionsV"
                                 :key="item.id"
                                 :label="item.street_name"
                                 :value="item.id">
@@ -244,7 +289,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所在居委会">
-                    <el-select v-model="formLabelAlignDetails.nbc_id" placeholder="请选择"
+                    <el-select filterable v-model="formLabelAlignDetails.nbc_id" placeholder="请选择"
                                @change="nbcChange(formLabelAlignDetails.nbc_id)">
                         <el-option
                                 v-for="item in optionsNbc"
@@ -255,7 +300,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所在小区">
-                    <el-select v-model="formLabelAlignDetails.village_id" placeholder="请选择">
+                    <el-select filterable v-model="formLabelAlignDetails.village_id" placeholder="请选择">
                         <el-option
                                 v-for="item in optionsVill"
                                 :key="item.id"
@@ -278,7 +323,7 @@
                     <el-input v-model="formLabelAlignDetails.user_name"></el-input>
                 </el-form-item>
                 <el-form-item label="身份证号">
-                    <el-input type="number" v-model="formLabelAlignDetails.card_number"></el-input>
+                    <el-input type="text" v-model="formLabelAlignDetails.card_number"></el-input>
                 </el-form-item>
                 <el-form-item label="电话">
                     <el-input type="number" v-model="formLabelAlignDetails.mobile"></el-input>
@@ -313,6 +358,13 @@
         data() {
             return {
                 activeName: '1',
+                formInline:{
+                    user_name:'',
+                    mobile:'',
+                    birth:'',
+                    village_id:null,
+                    village_ids:null,
+                },
                 formLabelAlign: {
                     street_id: null,
                     village_id: null,
@@ -340,9 +392,17 @@
                 options: [],
                 optionsNbc: [],
                 optionsVill: [],
+                optionsV:[],
+                childArray:[],
+                childrenData:[],
                 optionsType: [
                     {id: 0, type_name: "普通"}, {id: 1, type_name: "高龄"}, {id: 2, type_name: "残疾"},{id: 3, type_name: "困难"}
                 ],
+                props: {
+                    value: "name",
+                    label: "name",
+                    children: "child",
+                },
                 currentPage4: 1, /*分页*/
                 pageSize: 20,
                 total: 0,
@@ -393,7 +453,11 @@
                 var params = {
                     page: page,
                     token: sessionStorage.getItem("setToken"),
-                    type: type
+                    type: type,
+                    user_name:that.formInline.user_name,
+                    mobile:that.formInline.mobile,
+                    birth:that.formInline.birth,
+                    village_id:that.formInline.village_ids
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/userList`, params)
                     .then(function (res) {
@@ -544,9 +608,9 @@
                 axios.post(`${base.baseUrl}index.php/portal/old/streetList`, params)
                     .then(function (res) {
                         if (res.data.code === 1) {
-                            that.options = res.data.data;
+                            that.optionsV = res.data.data;
                         } else {
-                            that.options = []
+                            that.optionsV = []
                             that.$message({
                                 type: 'error',
                                 message: res.data.msg
@@ -629,10 +693,73 @@
                 this.currentPage4 = val;
                 this.gettpl(this.currentPage4)
             },
+            //回车查询
+            searchEnterFun(e) {
+                var keyCode = window.event ? e.keyCode : e.which;
+                if (keyCode == 13) {
+                    this.onSubmit()
+                }
+            },
+            // 点击查询
+            onSubmit() {
+                this.gettpl(1)
+            },
+            //级联选择器
+            handleChange(value) {
+                this.formInline.village_id = value.join("/")
+                if (this.childArray.length > 0) {
+                    for (var i = 0; i < this.childArray.length; i++) {
+                        if (this.childArray[i].length > 0) {
+                            for (var j = 0; j < this.childArray[i].length; j++) {
+                                if (this.childArray[i][j].name === value[2]) {
+                                    this.formInline.village_ids = this.childArray[i][j].id
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            //获取选项
+            getSelectlist() {
+                var that = this
+                var params = {
+                    token: sessionStorage.getItem("setToken"),
+                }
+                axios.post(`${base.baseUrl}index.php/portal/old/getList`, params)
+                    .then(function (res) {
+                        if (res.data.code === 1) {
+                            that.options = res.data.data;
+                            for (var i = 0; i < that.options.length; i++) {
+                                if (that.options[i].child) {
+                                    for (var j = 0; j < that.options[i].child.length; j++) {
+                                        if (that.options[i].child[j].child) {
+                                            that.childrenData = that.options[i].child[j].child
+                                            that.childArray.push(that.childrenData)
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            that.options = []
+                            that.$message({
+                                type: 'error',
+                                message: res.data.msg
+                            })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+        },
+        created () {
+            var that = this
+            that.getSelectlist()
         },
         mounted() {
             this.gettpl(1, 0)
             this.getSelect()
+            
         }
     }
 </script>
@@ -661,8 +788,26 @@
             .aaa, .el-table {
                 margin-bottom: 20px;
             }
+            /deep/ .report_demo_form .el-form-item__content {
+            width: 60% !important;
+        }
 
+        /deep/ .report_demo_form .el-form-item__content .el-date-editor, .report_demo_form .el-form-item__content, .report_demo_form .report_demo_form .el-form-item__content .el-select {
+            width: 100% !important;
+        }
+        .foodout1 {
+        position: relative;
+
+        }
+
+        .foodout1 .formLabelAlign {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 80% !important;
+        }
             .el-button--primary {
+                margin-bottom: 20px;
                 height: 30px;
                 padding: 0 10px;
                 background: linear-gradient(90deg, rgba(96, 157, 248, 1), rgba(84, 183, 235, 1));
@@ -681,12 +826,6 @@
                     font-weight: 400;
                     color: #606266;
                 }
-            }
-
-            .el-input {
-                width: 40%;
-                float: right;
-                margin-top: 20px;
             }
 
             .operation {

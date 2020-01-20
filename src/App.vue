@@ -49,4 +49,5 @@ export default {
   font-weight: 400;
   color: #606266;
 }
+
 </style>

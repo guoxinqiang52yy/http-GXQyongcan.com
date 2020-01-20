@@ -5,9 +5,30 @@
             <div slot="header" class="clearfix">
                 <span>居委会管理</span>
             </div>
-            <el-button type="primary" icon="el-icon-circle-plus-outline" @click="dialogFormVisible = true" class="aaa"
+            <el-form label-width="90px" :inline="true" :model="formInline"
+                                 class="report_demo_form">
+                            <el-form-item label="居委会名称" size="medium" style="width:30%">
+                                <el-input v-model="formInline.nbc_name"
+                                          @keyup.enter.native="searchEnterFun"></el-input>
+                            </el-form-item>
+                            
+                            <el-row class="myReportD">
+                                <el-col :span="20" style="border: none;">
+                                    <div class="grid-content bg-purple">
+                                        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="dialogFormVisible = true" class="aaa"
                        size="small">添加居委会
-            </el-button>
+                                        </el-button>
+                                    </div>
+                                </el-col>
+                                <el-col :span="4" style="border: none">
+                                    <div class="grid-content bg-purple">
+                                        <el-button style="float: right" size="mini" type="primary"
+                                                   @click="onSubmit()">查询
+                                        </el-button>
+                                    </div>
+                                </el-col>
+                            </el-row>
+                        </el-form>
             <!--表格-->
             <el-table
                     :cell-style="cellStyle"
@@ -61,15 +82,6 @@
         <el-dialog title="添加居委会" :visible.sync="dialogFormVisible">
             <el-form label-width="90px" :model="formLabelAlign">
                 <el-form-item label="所在街道">
-                    <!--<el-autocomplete-->
-                    <!--class="inline-input mediaInput"-->
-                    <!--size="mini"-->
-                    <!--v-model="formLabelAlign.street_id"-->
-                    <!--:fetch-suggestions="querySearch"-->
-                    <!--placeholder="请输入内容"-->
-                    <!--@select="handleSelect"-->
-                    <!--:trigger-on-focus="false"-->
-                    <!--&gt;</el-autocomplete>-->
                     <el-select v-model="formLabelAlign.street_id" placeholder="请选择">
                         <el-option
                                 v-for="item in options"
@@ -141,6 +153,9 @@
         data() {
             return {
                 activeName: '1',
+                formInline:{
+                    nbc_name:""
+                },
                 formLabelAlign: {
                     nbc_name: '',
                     street_id: '',
@@ -270,7 +285,8 @@
                 var params = {
                     page: page,
                     token: sessionStorage.getItem("setToken"),
-                    type: type
+                    type: type,
+                    nbc_name:that.formInline.nbc_name
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/nbcList`, params)
                     .then(function (res) {
@@ -322,6 +338,17 @@
                 this.currentPage4 = val;
                 this.gettpl(this.currentPage4)
             },
+            //回车查询
+            searchEnterFun(e) {
+                var keyCode = window.event ? e.keyCode : e.which;
+                if (keyCode == 13) {
+                    this.onSubmit()
+                }
+            },
+            // 点击查询
+            onSubmit() {
+                this.gettpl(1)
+            },
         },
         mounted() {
             this.gettpl(1, 0)
@@ -360,6 +387,7 @@
             }
 
             .el-button--primary {
+                margin-bottom: 20px;
                 height: 30px;
                 padding: 0 10px;
                 background: linear-gradient(90deg, rgba(96, 157, 248, 1), rgba(84, 183, 235, 1));

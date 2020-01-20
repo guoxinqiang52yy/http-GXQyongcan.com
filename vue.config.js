@@ -60,7 +60,7 @@ module.exports = {
 
         disableHostCheck: false,
 
-        host: "192.168.1.109",
+        host: "192.168.1.102",
 
         port: 8080,
 

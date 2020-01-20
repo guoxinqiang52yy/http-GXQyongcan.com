@@ -7,18 +7,29 @@
                 <span>月汇报表</span>
             </div>
             <div style="width: 100%;">
-                <el-form :rules="rules" :inline="true" :model="formLabelAlign" class="report_demo_form">
-                    <el-form-item label="选择日期：" size="medium" style="width:50%" prop="month">
-                        <el-select v-model="formLabelAlign.month" placeholder="请选择">
-                            <el-option
-                                    v-for="item in options"
-                                    :key="item"
-                                    :label="item"
-                                    :value="item">
-                            </el-option>
-                        </el-select>
+                <el-form :inline="true" :model="formLabelAlign" class="report_demo_form">
+                    <!--<el-form-item label="选择日期：" size="medium" style="width:50%" prop="month">-->
+                        <!--<el-select v-model="formLabelAlign.month" placeholder="请选择">-->
+                            <!--<el-option-->
+                                    <!--v-for="item in options"-->
+                                    <!--:key="item"-->
+                                    <!--:label="item"-->
+                                    <!--:value="item">-->
+                            <!--</el-option>-->
+                        <!--</el-select>-->
+                    <!--</el-form-item>-->
+                    <el-form-item label="选择日期：" size="medium" style="width:30%">
+                        <el-date-picker
+                                width="200"
+                                v-model="formLabelAlign.valueTime"
+                                value-format="yyyy-MM-dd"
+                                format="yyyy 年 MM 月 dd 日"
+                                type="daterange"
+                                start-placeholder="开始"
+                                end-placeholder="结束">
+                        </el-date-picker>
                     </el-form-item>
-                    <el-form-item class="foodout1" prop="village_id" label="小区：" size="medium" style="width:30%">
+                    <el-form-item class="foodout1" prop="village_id" label="小区：" size="medium">
                         <el-cascader
                                 placeholder="街道/居委会/小区"
                                 v-model="formLabelAlign.village_id"
@@ -66,27 +77,30 @@
                     children: "child",
                 },
                 formLabelAlign: {
-                    month: '',
                     village_id: '',
-                    village_ids: ''
+                    village_ids: '',
+                    valueTime: '',
+                    start_time:'',
+                    end_time:''
                 },
                 options: [],
                 options1: [],
                 childArray:[],
-                rules: {
-                    month: [
-                        {type: 'string', required: true, message: '请选择月份', trigger: 'change'}
-                    ]
-                },
             }
         },
         methods: {
             //领取表
             editClickUp() {
+                if (this.formLabelAlign.valueTime) {
+                    for (var j = 0; j < this.formLabelAlign.valueTime.length; j++) {
+                        this.formLabelAlign.start_time = this.formLabelAlign.valueTime[0]
+                        this.formLabelAlign.end_time = this.formLabelAlign.valueTime[1]
+                    }
+                }
                 var params = this.formLabelAlign
                 if (params.village_ids != "" && params.month != "") {
                     var a = document.createElement('a')
-                    a.href = `${base.baseUrl}index.php/portal/order/excelByMonth?month=${params.month}&village_id=${params.village_ids}&token=${sessionStorage.getItem("setToken")}`
+                    a.href = `${base.baseUrl}index.php/portal/order/excelByMonth?start_time=${params.start_time}&village_id=${params.village_ids}&end_time=${params.end_time}&token=${sessionStorage.getItem("setToken")}`
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
@@ -188,8 +202,21 @@
 
 <style scoped lang="less">
     .recom {
-
-
+        /deep/ .report_demo_form .el-form-item__content .el-date-editor, .report_demo_form .el-form-item__content, .report_demo_form .report_demo_form .el-form-item__content .el-select {
+            width: 100% !important;
+        }
+        /deep/ .report_demo_form .el-form-item__content {
+            width: 60% !important;
+        }
+        .foodout1{
+            position: relative;
+        }
+        .foodout1 .formLabelAlign{
+            position: absolute;
+            left: 0;
+            top:0;
+            width: 80% !important;
+        }
         .box-card {
             width: 100%;
 
@@ -208,18 +235,10 @@
                 padding: 0 10px;
                 background: linear-gradient(90deg, rgba(96, 157, 248, 1), rgba(84, 183, 235, 1));
             }
-            .foodout1{
-                position: relative;
-            }
-            .foodout1 .formLabelAlign{
-                position: absolute;
-                left: 0;
-                top:0;
-                width: 80%;
-            }
-            .el-select .el-input {
-                width: 130px;
-            }
+
+            /*.el-select .el-input {*/
+                /*width: 130px;*/
+            /*}*/
 
             .input-with-select .el-input-group__prepend {
                 background-color: #fff;
