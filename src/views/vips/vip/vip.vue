@@ -12,11 +12,11 @@
                                  class="report_demo_form">
                             <el-form-item label="用户姓名：" size="medium" style="width:19%">
                                 <el-input v-model="formInline.user_name"
-                                          @keyup.enter.native="searchEnterFun"></el-input>
+                                          clearable @keyup.enter.native="searchEnterFun"></el-input>
                             </el-form-item>
                             <el-form-item label="手机号：" size="medium" style="width:19%">
                                 <el-input v-model="formInline.mobile"
-                                          @keyup.enter.native="searchEnterFun"></el-input>
+                                          clearable @keyup.enter.native="searchEnterFun"></el-input>
                             </el-form-item>
                             <el-form-item label="选择日期：" size="medium" style="width:19%">
                                 <el-date-picker
@@ -29,7 +29,7 @@
                                 </el-date-picker>
                             </el-form-item>
                             <el-form-item class="foodout1" label="小区：" size="medium" style=""
-                                          >
+                            >
                                 <el-cascader
                                         placeholder="街道/居委会/小区"
                                         v-model="formInline.village_id"
@@ -40,6 +40,16 @@
                                 <el-input :disabled="true" class="formLabelAlign"
                                           v-model="formInline.village_id" prop="village_id">
                                 </el-input>
+                            </el-form-item>
+                            <el-form-item label="老人类别" size="medium">
+                                <el-select v-model="formInline.type" placeholder="请选择">
+                                    <el-option
+                                            v-for="item in optionsType"
+                                            :key="item.id"
+                                            :label="item.type_name"
+                                            :value="item.id">
+                                    </el-option>
+                                </el-select>
                             </el-form-item>
                             <el-row class="myReportD">
                                 <el-col :span="20" style="border: none;">
@@ -131,6 +141,9 @@
                         <el-option label="堂食" value="2"></el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item label="数量">
+                    <el-input v-model="formLabelAlign.num"></el-input>
+                </el-form-item>
                 <el-form-item label="备注">
                     <el-input
                             type="textarea"
@@ -183,18 +196,27 @@
                     end_time: '',
                     village_id: '',
                     village_ids: '',
-                    valueTime: ''
+                    valueTime: '',
+                    type: -1
                 }, /*查询的表单数据*/
                 datasDatas: [], /*查询年份*/
                 arrDate_: [{id: '', date: '全部'}], /*查询年份*/
+                optionsType: [
+                    {id: -1, type_name: "全部"},
+                    {id: 0, type_name: "普通"},
+                    {id: 1, type_name: "高龄"},
+                    {id: 2, type_name: "残疾"},
+                    {id: 3, type_name: "困难"}
+                ],
                 formLabelAlign: {
                     main_food: '',
                     standard: '',
                     send_type: '',
                     send_date: [],
                     user_id: '',
-                    pay_status:'',
-                    remark:''
+                    pay_status: '',
+                    remark: '',
+                    num:''
                 },/*缴费表单数据*/
                 multipleSelection: [],
                 childArray: [],
@@ -299,7 +321,7 @@
                             })
                             that.dialogFormVisibleGo = false
                             that.formLabelAlign = {}
-                            that.gettpl(1, 0)
+                            that.gettpl(1)
                         } else {
                             that.$message({
                                 type: 'error',
@@ -372,7 +394,7 @@
                 var params = {
                     page: page,
                     token: sessionStorage.getItem("setToken"),
-                    type: type
+                    type: that.formInline.type,
                 }
                 axios.post(`${base.baseUrl}index.php/portal/order/userList`, params)
                     .then(function (res) {
@@ -397,7 +419,7 @@
 
         },
         mounted() {
-            this.gettpl(1, 0)
+            this.gettpl(1)
             this.getSelect()
         }
     }
@@ -451,6 +473,7 @@
             /*height: 54px;*/
             /*}*/
         }
+
         .percentage {
             width: 100px;
             margin: 0 10px;
@@ -491,7 +514,7 @@
                 }
 
                 /*.el-form-item .el-input, .el-select {*/
-                    /*width: 150px;*/
+                /*width: 150px;*/
                 /*}*/
 
                 .demo-table-expand {

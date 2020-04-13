@@ -6,29 +6,29 @@
                 <span>居委会管理</span>
             </div>
             <el-form label-width="90px" :inline="true" :model="formInline"
-                                 class="report_demo_form">
-                            <el-form-item label="居委会名称" size="medium" style="width:30%">
-                                <el-input v-model="formInline.nbc_name"
-                                          @keyup.enter.native="searchEnterFun"></el-input>
-                            </el-form-item>
-                            
-                            <el-row class="myReportD">
-                                <el-col :span="20" style="border: none;">
-                                    <div class="grid-content bg-purple">
-                                        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="dialogFormVisible = true" class="aaa"
-                       size="small">添加居委会
-                                        </el-button>
-                                    </div>
-                                </el-col>
-                                <el-col :span="4" style="border: none">
-                                    <div class="grid-content bg-purple">
-                                        <el-button style="float: right" size="mini" type="primary"
-                                                   @click="onSubmit()">查询
-                                        </el-button>
-                                    </div>
-                                </el-col>
-                            </el-row>
-                        </el-form>
+                     class="report_demo_form">
+                <el-form-item label="居委会名称" size="medium" style="width:30%">
+                    <el-input clearable v-model="formInline.nbc_name"
+                              @keyup.enter.native="searchEnterFun"></el-input>
+                </el-form-item>
+                <el-row class="myReportD">
+                    <el-col :span="20" style="border: none;">
+                        <div class="grid-content bg-purple">
+                            <el-button type="primary" icon="el-icon-circle-plus-outline"
+                                       @click="dialogFormVisible = true" class="aaa"
+                                       size="small">添加居委会
+                            </el-button>
+                        </div>
+                    </el-col>
+                    <el-col :span="4" style="border: none">
+                        <div class="grid-content bg-purple">
+                            <el-button style="float: right" size="mini" type="primary"
+                                       @click="onSubmit()">查询
+                            </el-button>
+                        </div>
+                    </el-col>
+                </el-row>
+            </el-form>
             <!--表格-->
             <el-table
                     :cell-style="cellStyle"
@@ -153,14 +153,20 @@
         data() {
             return {
                 activeName: '1',
-                formInline:{
-                    nbc_name:""
+                formInline: {
+                    nbc_name: "",
                 },
                 formLabelAlign: {
                     nbc_name: '',
                     street_id: '',
                     remark: ''
                 },/*新增data*/
+                optionsType: [
+                    {id: 0, type_name: "普通"},
+                    {id: 1, type_name: "高龄"},
+                    {id: 2, type_name: "残疾"},
+                    {id: 3, type_name: "困难"}
+                ],
                 formLabelAlignEdit: {},
                 dialogFormVisible: false,
                 dialogFormVisibleEdit: false,
@@ -192,7 +198,7 @@
                             })
                             that.dialogFormVisible = false
                             that.formLabelAlign = {}
-                            that.gettpl(1, 0)
+                            that.gettpl(1)
                         } else {
                             that.$message({
                                 type: 'error',
@@ -218,7 +224,7 @@
                             })
                             that.dialogFormVisibleEdit = false
                             that.formLabelAlignEdit = {}
-                            that.gettpl(1, 0)
+                            that.gettpl(1)
                         } else {
                             that.$message({
                                 type: 'error',
@@ -257,7 +263,7 @@
                                     type: 'success',
                                     message: res.data.msg
                                 })
-                                that.gettpl(1, 0)
+                                that.gettpl(1)
                             } else {
                                 that.$message({
                                     type: 'error',
@@ -285,8 +291,7 @@
                 var params = {
                     page: page,
                     token: sessionStorage.getItem("setToken"),
-                    type: type,
-                    nbc_name:that.formInline.nbc_name
+                    nbc_name: that.formInline.nbc_name
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/nbcList`, params)
                     .then(function (res) {
@@ -351,7 +356,7 @@
             },
         },
         mounted() {
-            this.gettpl(1, 0)
+            this.gettpl(1)
             this.getSelect()
         }
     }

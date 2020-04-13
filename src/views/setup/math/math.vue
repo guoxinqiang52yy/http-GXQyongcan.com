@@ -6,48 +6,60 @@
                 <span>用户管理</span>
             </div>
             <el-form label-width="80px" :inline="true" :model="formInline"
-                                 class="report_demo_form">
-                            <el-form-item label="用户名" size="medium" style="width:19%">
-                                <el-input type="text" v-model="formInline.user_name"
-                                          @keyup.enter.native="searchEnterFun"></el-input>
-                            </el-form-item>
-                            <el-form-item label="手机号" size="medium" style="width:19%">
-                                <el-input type="number" v-model="formInline.mobile"
-                                          @keyup.enter.native="searchEnterFun"></el-input>
-                            </el-form-item>
-                            <el-form-item label="生日" size="medium" style="width:19%">
-                                <el-input type="text" placeholder="格式 (11月21日)" v-model="formInline.birth"
-                                          @keyup.enter.native="searchEnterFun"></el-input>
-                            </el-form-item>
-                            <el-form-item class="foodout1" label="小区：" size="medium" style=""
-                                          >
-                                <el-cascader
-                                        clearable
-                                        :props="props"
-                                        placeholder="街道/居委会/小区"
-                                        v-model="formInline.village_id"
-                                        :options="options"
-                                        @change="handleChange">
-                                </el-cascader>
-                                <el-input :disabled="true" class="formLabelAlign"
-                                          v-model="formInline.village_id">
-                                </el-input>
-                            </el-form-item>
-                            <el-row class="myReportD">
-                                <el-col :span="20" style="border: none;">
-                                    <div class="grid-content bg-purple">
-                                        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="dialogFormVisible = true" class="aaa" size="small">添加用户</el-button>
-                                    </div>
-                                </el-col>
-                                <el-col :span="4" style="border: none">
-                                    <div class="grid-content bg-purple">
-                                        <el-button style="float: right" size="mini" type="primary"
-                                                   @click="onSubmit()">查询
-                                        </el-button>
-                                    </div>
-                                </el-col>
-                            </el-row>
-                        </el-form>
+                     class="report_demo_form">
+                <el-form-item label="用户名" size="medium" style="width:19%">
+                    <el-input type="text" v-model="formInline.user_name"
+                              clearable @keyup.enter.native="searchEnterFun"></el-input>
+                </el-form-item>
+                <el-form-item label="手机号" size="medium" style="width:19%">
+                    <el-input type="number" v-model="formInline.mobile"
+                              clearable @keyup.enter.native="searchEnterFun"></el-input>
+                </el-form-item>
+                <el-form-item label="生日" size="medium" style="width:19%">
+                    <el-input type="text" placeholder="格式 (11月21日)" v-model="formInline.birth"
+                              @keyup.enter.native="searchEnterFun"></el-input>
+                </el-form-item>
+                <el-form-item class="foodout1" label="小区：" size="medium" style=""
+                >
+                    <el-cascader
+                            clearable
+                            :props="props"
+                            placeholder="街道/居委会/小区"
+                            v-model="formInline.village_id"
+                            :options="options"
+                            @change="handleChange">
+                    </el-cascader>
+                    <el-input :disabled="true" class="formLabelAlign"
+                              v-model="formInline.village_id">
+                    </el-input>
+                </el-form-item>
+                <el-form-item label="老人类别" size="medium">
+                    <el-select v-model="formInline.type" placeholder="请选择">
+                        <el-option
+                                v-for="item in optionsType"
+                                :key="item.id"
+                                :label="item.type_name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-row class="myReportD">
+                    <el-col :span="20" style="border: none;">
+                        <div class="grid-content bg-purple">
+                            <el-button type="primary" icon="el-icon-circle-plus-outline"
+                                       @click="dialogFormVisible = true" class="aaa" size="small">添加用户
+                            </el-button>
+                        </div>
+                    </el-col>
+                    <el-col :span="4" style="border: none">
+                        <div class="grid-content bg-purple">
+                            <el-button style="float: right" size="mini" type="primary"
+                                       @click="onSubmit()">查询
+                            </el-button>
+                        </div>
+                    </el-col>
+                </el-row>
+            </el-form>
             <!--表格-->
             <el-table
                     :cell-style="cellStyle"
@@ -231,7 +243,8 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="所在小区">
-                    <el-select filterable v-model="formLabelAlignEdit.village_id" placeholder="请选择" @change="villageChange">
+                    <el-select filterable v-model="formLabelAlignEdit.village_id" placeholder="请选择"
+                               @change="villageChange">
                         <el-option
                                 v-for="item in optionsVill"
                                 :key="item.id"
@@ -358,13 +371,21 @@
         data() {
             return {
                 activeName: '1',
-                formInline:{
-                    user_name:'',
-                    mobile:'',
-                    birth:'',
-                    village_id:null,
-                    village_ids:null,
+                formInline: {
+                    user_name: '',
+                    mobile: '',
+                    birth: '',
+                    village_id: null,
+                    village_ids: null,
+                    type: -1
                 },
+                optionsType: [
+                    {id: 0, type_name: "普通"},
+                    {id: 1, type_name: "高龄"},
+                    {id: 2, type_name: "残疾"},
+                    {id: 3, type_name: "困难"},
+                    {id: -1, type_name: "全部"},
+                ],
                 formLabelAlign: {
                     street_id: null,
                     village_id: null,
@@ -375,7 +396,7 @@
                     address: '',
                     type: '',
                     mobile: '',
-                    now_address:''
+                    now_address: ''
                 },/*新增数据*/
                 formLabelAlignEdit: {},/*编辑数据*/
                 formLabelAlignDetails: {},/*编辑数据*/
@@ -392,12 +413,9 @@
                 options: [],
                 optionsNbc: [],
                 optionsVill: [],
-                optionsV:[],
-                childArray:[],
-                childrenData:[],
-                optionsType: [
-                    {id: 0, type_name: "普通"}, {id: 1, type_name: "高龄"}, {id: 2, type_name: "残疾"},{id: 3, type_name: "困难"}
-                ],
+                optionsV: [],
+                childArray: [],
+                childrenData: [],
                 props: {
                     value: "name",
                     label: "name",
@@ -425,7 +443,7 @@
                                     type: 'success',
                                     message: res.data.msg
                                 })
-                                that.gettpl(1, 0)
+                                that.gettpl(1)
                             } else {
                                 that.$message({
                                     type: 'error',
@@ -453,11 +471,11 @@
                 var params = {
                     page: page,
                     token: sessionStorage.getItem("setToken"),
-                    type: type,
-                    user_name:that.formInline.user_name,
-                    mobile:that.formInline.mobile,
-                    birth:that.formInline.birth,
-                    village_id:that.formInline.village_ids
+                    type: that.formInline.type,
+                    user_name: that.formInline.user_name,
+                    mobile: that.formInline.mobile,
+                    birth: that.formInline.birth,
+                    village_id: that.formInline.village_ids
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/userList`, params)
                     .then(function (res) {
@@ -492,8 +510,8 @@
                         if (res.data.code === 1) {
                             that.formLabelAlignDetails = res.data.data
                             var formLabelAlignEdit = JSON.parse(JSON.stringify(that.formLabelAlignDetails))
-                            that.getSelectNbc(that.formLabelAlignDetails.street_id,formLabelAlignEdit)
-                            that.getSelectVill(that.formLabelAlignDetails.nbc_id,formLabelAlignEdit)
+                            that.getSelectNbc(that.formLabelAlignDetails.street_id, formLabelAlignEdit)
+                            that.getSelectVill(that.formLabelAlignDetails.nbc_id, formLabelAlignEdit)
                         } else {
                             that.$message({
                                 type: 'error',
@@ -558,7 +576,6 @@
                         console.log(error);
                     });
             },
-
             //点击编辑
             editFunction(index, row) {
                 let that = this
@@ -569,8 +586,8 @@
                         if (res.data.code === 1) {
                             that.formLabelAlignEdit = res.data.data
                             var formLabelAlignEdit = JSON.parse(JSON.stringify(that.formLabelAlignEdit))
-                            that.getSelectNbc(that.formLabelAlignEdit.street_id,formLabelAlignEdit)
-                            that.getSelectVill(that.formLabelAlignEdit.nbc_id,formLabelAlignEdit)
+                            that.getSelectNbc(that.formLabelAlignEdit.street_id, formLabelAlignEdit)
+                            that.getSelectVill(that.formLabelAlignEdit.nbc_id, formLabelAlignEdit)
 
                         } else {
                             that.$message({
@@ -584,14 +601,14 @@
                     });
             },
             //选择街道时
-            streetChange(id,formLabelAlignEdit) {
-                this.getSelectNbc(id,formLabelAlignEdit)
+            streetChange(id, formLabelAlignEdit) {
+                this.getSelectNbc(id, formLabelAlignEdit)
             },
             //选择居委会时
-            nbcChange(id,formLabelAlignEdit) {
+            nbcChange(id, formLabelAlignEdit) {
                 var formData = JSON.parse(JSON.stringify(formLabelAlignEdit))
                 this.$set(formData, formData.nbc_id, id)
-                this.getSelectVill(id,formLabelAlignEdit)
+                this.getSelectVill(id, formLabelAlignEdit)
             },
             //选择小区时
             villageChange(val) {
@@ -621,9 +638,8 @@
                         console.log(error);
                     });
             },
-
             //获取居委会选项
-            getSelectNbc(street_id,formLabelAlignEdit) {
+            getSelectNbc(street_id, formLabelAlignEdit) {
                 formLabelAlignEdit.nbc_id = null
                 var that = this
                 var params = {
@@ -654,7 +670,7 @@
                     });
             },
             //获取小区选项
-            getSelectVill(nbc_id,formLabelAlignEdit) {
+            getSelectVill(nbc_id, formLabelAlignEdit) {
                 formLabelAlignEdit.village_id = null
                 var that = this
                 var params = {
@@ -752,14 +768,14 @@
                     });
             },
         },
-        created () {
+        created() {
             var that = this
             that.getSelectlist()
         },
         mounted() {
-            this.gettpl(1, 0)
+            this.gettpl(1)
             this.getSelect()
-            
+
         }
     }
 </script>
@@ -788,24 +804,27 @@
             .aaa, .el-table {
                 margin-bottom: 20px;
             }
+
             /deep/ .report_demo_form .el-form-item__content {
-            width: 60% !important;
-        }
+                width: 60% !important;
+            }
 
-        /deep/ .report_demo_form .el-form-item__content .el-date-editor, .report_demo_form .el-form-item__content, .report_demo_form .report_demo_form .el-form-item__content .el-select {
-            width: 100% !important;
-        }
-        .foodout1 {
-        position: relative;
+            /deep/ .report_demo_form .el-form-item__content .el-date-editor, .report_demo_form .el-form-item__content, .report_demo_form .report_demo_form .el-form-item__content .el-select {
+                width: 100% !important;
+            }
 
-        }
+            .foodout1 {
+                position: relative;
 
-        .foodout1 .formLabelAlign {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 80% !important;
-        }
+            }
+
+            .foodout1 .formLabelAlign {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 80% !important;
+            }
+
             .el-button--primary {
                 margin-bottom: 20px;
                 height: 30px;

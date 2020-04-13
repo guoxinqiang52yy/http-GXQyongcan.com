@@ -18,7 +18,16 @@
                                 end-placeholder="结束">
                         </el-date-picker>
                     </el-form-item>
-
+                    <el-form-item label="老人类别" size="medium">
+                        <el-select v-model="formLabelAlign.type" placeholder="请选择">
+                            <el-option
+                                    v-for="item in optionsType"
+                                    :key="item.id"
+                                    :label="item.type_name"
+                                    :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
                     <el-row class="myReportD">
                         <el-col :span="4" style="border: none;padding:20px 0;">
 
@@ -90,7 +99,15 @@
                 tableData: [], /*表格数据*/
                 formLabelAlign: {
                     date: '',
+                    type: -1
                 },
+                optionsType: [
+                    {id: -1, type_name: "全部"},
+                    {id: 0, type_name: "普通"},
+                    {id: 1, type_name: "高龄"},
+                    {id: 2, type_name: "残疾"},
+                    {id: 3, type_name: "困难"}
+                ],
             }
         },
         methods: {
@@ -100,7 +117,8 @@
                 var params = {
                     month:that.formLabelAlign.date,
                     token: sessionStorage.getItem("setToken"),
-                    page:page
+                    page:page,
+                    type: that.formLabelAlign.type,
                 }
                 if ( params.month != "") {
                     axios.post(`${base.baseUrl}index.php/portal/order/allVillageMonth`, params)
@@ -151,9 +169,7 @@
                 return "text-align:center"
             },
         },
-        mounted() {
-
-        }
+        mounted() {}
     }
 </script>
 

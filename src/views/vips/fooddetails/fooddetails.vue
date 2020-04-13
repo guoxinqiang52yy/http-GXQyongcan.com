@@ -12,11 +12,11 @@
                                  class="report_demo_form">
                             <el-form-item label="用户姓名：" size="medium" style="width:19%">
                                 <el-input v-model="formInline.user_name"
-                                          @keyup.enter.native="searchEnterFun"></el-input>
+                                          clearable @keyup.enter.native="searchEnterFun"></el-input>
                             </el-form-item>
                             <el-form-item label="手机号：" size="medium" style="width:19%">
                                 <el-input v-model="formInline.mobile"
-                                          @keyup.enter.native="searchEnterFun"></el-input>
+                                          clearable @keyup.enter.native="searchEnterFun"></el-input>
                             </el-form-item>
                             <el-form-item label="选择日期：" size="medium" style="width:19%">
                                 <el-date-picker
@@ -39,6 +39,16 @@
                                 </el-cascader>
                                 <el-input :disabled="true" class="formLabelAlign"
                                           v-model="formInline.village_id"></el-input>
+                            </el-form-item>
+                            <el-form-item label="老人类别" size="medium">
+                                <el-select v-model="formInline.type" placeholder="请选择">
+                                    <el-option
+                                            v-for="item in optionsType"
+                                            :key="item.id"
+                                            :label="item.type_name"
+                                            :value="item.id">
+                                    </el-option>
+                                </el-select>
                             </el-form-item>
                             <el-row class="myReportD">
                                 <el-col :span="20" style="border: none;">
@@ -101,6 +111,13 @@
                                                 <span>{{scope.row.send_type == 0?"自取":scope.row.send_type == 1?"送餐":"堂食"}}</span>
                                             </template>
                                         </el-table-column>
+                                        <el-table-column label="操作" :resizable="false">
+                                            <template slot-scope="scope">
+                                                <el-button type="text" style="color:#32AFF0;marginLeft:6px;"
+                                                           @click="showInTable(scope.row)">退餐
+                                                </el-button>
+                                            </template>
+                                        </el-table-column>
                                     </el-table>
                                 </div>
                                 <!--分页器-->
@@ -149,7 +166,8 @@
                     end_time: '',
                     village_id: '',
                     village_ids: '',
-                    valueTime: ''
+                    valueTime: '',
+                    type: -1
                 }, /*查询的表单数据*/
                 datasDatas: [], /*查询年份*/
                 arrDate_: [{id: '', date: '全部'}], /*查询年份*/
@@ -163,6 +181,13 @@
                 multipleSelection: [],
                 childArray: [],
                 childrenData: [],
+                optionsType: [
+                    {id: -1, type_name: "全部"},
+                    {id: 0, type_name: "普通"},
+                    {id: 1, type_name: "高龄"},
+                    {id: 2, type_name: "残疾"},
+                    {id: 3, type_name: "困难"}
+                ],
                 props: {
                     value: "name",
                     label: "name",
@@ -176,15 +201,45 @@
             }
         },
         methods: {
+            //退餐
+            showInTable(row){
+                this.$confirm(`确定退餐吗?`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    let that = this
+                    var params = {id: row.id, token: sessionStorage.getItem("setToken")}
+                    axios.post(`${base.baseUrl}index.php/portal/order/deleteOrder`, params)
+                        .then(function (res) {
+                            if (res.data.code === 1) {
+                                that.$message({
+                                    type: 'success',
+                                    message: res.data.msg
+                                })
+                                that.onSubmit()
+                            } else {
+                                that.$message({
+                                    type: 'error',
+                                    message: res.data.msg
+                                })
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消退餐'
+                    });
+                });
+            },
             // 销毁组件
             handleClose() {
                 this.$confirm('确认关闭?', '提示').then(() => {
                     this.hackReset = false;// 销毁组件
                     this.dialogTableVisible = false;
-                    /*
-                    * 功能: 关闭归档弹框时触发行内浏览事件,刷新数据
-                    * */
-
                 }).catch(() => {
                 });
             },
@@ -203,6 +258,7 @@
                     village_id: that.formInline.village_ids,
                     start_time: that.formInline.start_time,
                     end_time: that.formInline.end_time,
+                    type: that.formInline.type,
                     token: sessionStorage.getItem("setToken"),
                 }
                 axios.post(`${base.baseUrl}index.php/portal/order/dingList`, params)
@@ -363,7 +419,7 @@
 
         },
         mounted() {
-            this.gettpl(1, 0)
+            this.gettpl(1)
             this.getSelect()
         }
     }

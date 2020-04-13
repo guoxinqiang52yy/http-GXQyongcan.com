@@ -29,7 +29,7 @@
                                 end-placeholder="结束">
                         </el-date-picker>
                     </el-form-item>
-                    <el-form-item class="foodout1" prop="village_id" label="小区：" size="medium">
+                    <el-form-item class="foodout1" prop="village_id" label="居委会：" size="medium">
                         <el-cascader
                                 placeholder="街道/居委会/小区"
                                 v-model="formLabelAlign.village_id"
@@ -37,7 +37,9 @@
                                 @change="handleChange"
                                 :props="props">
                         </el-cascader>
+                            <el-tooltip class="item" effect="dark" :content="formLabelAlign.village_id" placement="top-start">
                         <el-input :disabled="true" class="formLabelAlign" v-model="formLabelAlign.village_id"></el-input>
+                            </el-tooltip>
                     </el-form-item>
                     <el-row class="myReportD">
                         <el-col :span="20" style="border: none;">
@@ -145,15 +147,12 @@
             //级联选择器
             handleChange(value) {
                 this.formLabelAlign.village_id = value.join("/")
+                console.log(this.childArray);
                 if (this.childArray.length > 0) {
                     for (var i = 0; i < this.childArray.length; i++) {
-                        if (this.childArray[i].length > 0) {
-                            for (var j = 0; j < this.childArray[i].length; j++) {
-                                if (this.childArray[i][j].name === value[2]) {
-                                    this.formLabelAlign.village_ids = this.childArray[i][j].id
+                                if (this.childArray[i].name === value[1]) {
+                                    this.formLabelAlign.village_ids = this.childArray[i].id
                                 }
-                            }
-                        }
                     }
                 }
             },
@@ -171,7 +170,8 @@
                                 if (that.options1[i].child) {
                                     for (var j = 0; j < that.options1[i].child.length; j++) {
                                         if (that.options1[i].child[j].child) {
-                                            that.childrenData = that.options1[i].child[j].child
+                                            that.options1[i].child[j].child = ""
+                                            that.childrenData = that.options1[i].child[j]
                                             that.childArray.push(that.childrenData)
                                         }
                                     }

@@ -12,11 +12,11 @@
                                  class="report_demo_form">
                             <el-form-item label="用户姓名：" size="medium" style="width:19%">
                                 <el-input v-model="formInline.user_name"
-                                          @keyup.enter.native="searchEnterFun"></el-input>
+                                          clearable @keyup.enter.native="searchEnterFun"></el-input>
                             </el-form-item>
                             <el-form-item label="手机号：" size="medium" style="width:19%">
                                 <el-input v-model="formInline.mobile"
-                                          @keyup.enter.native="searchEnterFun"></el-input>
+                                          clearable @keyup.enter.native="searchEnterFun"></el-input>
                             </el-form-item>
                             <el-form-item label="选择日期：" size="medium" style="width:19%">
                                 <el-date-picker
@@ -38,6 +38,16 @@
                                 </el-cascader>
                                 <el-input :disabled="true" class="formLabelAlign"
                                           v-model="formInline.village_id"></el-input>
+                            </el-form-item>
+                            <el-form-item label="老人类别" size="medium">
+                                <el-select v-model="formInline.type" placeholder="请选择">
+                                    <el-option
+                                            v-for="item in optionsType"
+                                            :key="item.id"
+                                            :label="item.type_name"
+                                            :value="item.id">
+                                    </el-option>
+                                </el-select>
                             </el-form-item>
                             <el-row class="myReportD">
                                 <el-col :span="20" style="border: none;">
@@ -97,7 +107,9 @@
                                         <el-button type="text" @click="showInTable(scope.row)">
                                             缴费
                                         </el-button>
-                                        <el-button type="text" :class="scope.row.pay_status == 0?'paystatus':'paystatushide'" @click="showIngo(scope.row)">
+                                        <el-button type="text"
+                                                   :class="scope.row.pay_status == 0?'paystatus':'paystatushide'"
+                                                   @click="showIngo(scope.row)">
                                             补交
                                         </el-button>
                                     </template>
@@ -193,13 +205,21 @@
                     end_time: '',
                     village_id: '',
                     village_ids: '',
-                    valueTime: ''
+                    valueTime: '',
+                    type: -1
                 }, /*查询的表单数据*/
                 datasDatas: [], /*查询年份*/
                 arrDate_: [{id: '', date: '全部'}], /*查询年份*/
                 multipleSelection: [],
                 childArray: [],
                 childrenData: [],
+                optionsType: [
+                    {id: -1, type_name: "全部"},
+                    {id: 0, type_name: "普通"},
+                    {id: 1, type_name: "高龄"},
+                    {id: 2, type_name: "残疾"},
+                    {id: 3, type_name: "困难"}
+                ],
                 props: {
                     value: "name",
                     label: "name",
@@ -229,7 +249,7 @@
                                     type: 'success',
                                     message: res.data.msg
                                 })
-                                that.gettpl(1, 0)
+                                that.onSubmit()
                             } else {
                                 that.$message({
                                     type: 'error',
@@ -275,6 +295,7 @@
                     start_time: that.formInline.start_time,
                     end_time: that.formInline.end_time,
                     token: sessionStorage.getItem("setToken"),
+                    type: that.formInline.type,
                 }
                 axios.post(`${base.baseUrl}index.php/portal/order/orderList`, params)
                     .then(function (res) {
@@ -374,7 +395,7 @@
                             })
                             that.dialogFormVisibleGo = false
                             that.formLabelAlign = {}
-                            that.gettpl(1, 0)
+                            that.gettpl(1)
                         } else {
                             that.$message({
                                 type: 'error',
@@ -445,7 +466,7 @@
                 var that = this
                 var params = {
                     page: page,
-                    token:sessionStorage.getItem("setToken"),
+                    token: sessionStorage.getItem("setToken"),
                     type: type
                 }
                 axios.post(`${base.baseUrl}index.php/portal/order/orderList`, params)
@@ -469,7 +490,7 @@
 
         },
         mounted() {
-            this.gettpl(1, 0)
+            this.gettpl(1)
             this.getSelect()
         }
     }
@@ -477,12 +498,14 @@
 
 <style lang="less" scoped>
 
-.paystatus{
-    display: block;
-}
-.paystatushide{
-    display: none;
-}
+    .paystatus {
+        display: block;
+    }
+
+    .paystatushide {
+        display: none;
+    }
+
     .el-button--primary {
         height: 30px;
         padding: 0 10px;

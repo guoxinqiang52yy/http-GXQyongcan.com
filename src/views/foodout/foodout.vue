@@ -27,8 +27,9 @@
                                 @change="handleChange"
                                 :props="props">
                         </el-cascader>
-                        <el-input :disabled="true" class="formLabelAlign"
-                                  v-model="formLabelAlign.village_id"></el-input>
+                        <el-tooltip class="item" effect="dark" :content="formLabelAlign.village_id" placement="top-start">
+                            <el-input :disabled="true" class="formLabelAlign" v-model="formLabelAlign.village_id"></el-input>
+                        </el-tooltip>
                     </el-form-item>
                     <el-row class="myReportD">
                         <el-col :span="20" style="border: none;">

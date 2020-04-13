@@ -6,30 +6,30 @@
                 <span>小区管理</span>
             </div>
             <el-form label-width="80px" :inline="true" :model="formInline"
-                                 class="report_demo_form">
-                            <el-form-item label="小区名称" size="medium" style="width:30%">
-                                <el-input v-model="formInline.village_name"
-                                          @keyup.enter.native="searchEnterFun"></el-input>
-                            </el-form-item>
-                            
-                            <el-row class="myReportD">
-                                <el-col :span="20" style="border: none;">
-                                    <div class="grid-content bg-purple">
-                                        <el-button type="primary" icon="el-icon-circle-plus-outline" @click="dialogFormVisible = true" class="aaa"
-                       size="small">添加小区
-                                        </el-button>
-                                    </div>
-                                </el-col>
-                                <el-col :span="4" style="border: none">
-                                    <div class="grid-content bg-purple">
-                                        <el-button style="float: right" size="mini" type="primary"
-                                                   @click="onSubmit()">查询
-                                        </el-button>
-                                    </div>
-                                </el-col>
-                            </el-row>
-                        </el-form>
-            
+                     class="report_demo_form">
+                <el-form-item label="小区名称" size="medium" style="width:30%">
+                    <el-input v-model="formInline.village_name"
+                              clearable @keyup.enter.native="searchEnterFun"></el-input>
+                </el-form-item>
+                <el-row class="myReportD">
+                    <el-col :span="20" style="border: none;">
+                        <div class="grid-content bg-purple">
+                            <el-button type="primary" icon="el-icon-circle-plus-outline"
+                                       @click="dialogFormVisible = true" class="aaa"
+                                       size="small">添加小区
+                            </el-button>
+                        </div>
+                    </el-col>
+                    <el-col :span="4" style="border: none">
+                        <div class="grid-content bg-purple">
+                            <el-button style="float: right" size="mini" type="primary"
+                                       @click="onSubmit()">查询
+                            </el-button>
+                        </div>
+                    </el-col>
+                </el-row>
+            </el-form>
+
             <!--表格-->
             <el-table
                     :cell-style="cellStyle"
@@ -184,9 +184,15 @@
         data() {
             return {
                 activeName: '1',
-                formInline:{
-                    village_name:""
+                formInline: {
+                    village_name: "",
                 },
+                optionsType: [
+                    {id: 0, type_name: "普通"},
+                    {id: 1, type_name: "高龄"},
+                    {id: 2, type_name: "残疾"},
+                    {id: 3, type_name: "困难"}
+                ],
                 formLabelAlign: {
                     village_name: '',
                     remark: '',
@@ -255,8 +261,7 @@
                 var params = {
                     page: page,
                     token: sessionStorage.getItem("setToken"),
-                    type: type,
-                    village_name:that.formInline.village_name
+                    village_name: that.formInline.village_name
                 }
                 axios.post(`${base.baseUrl}index.php/portal/old/villageList`, params)
                     .then(function (res) {
@@ -316,7 +321,7 @@
                             })
                             that.dialogFormVisibleEdit = false
                             that.formLabelAlignEdit = {}
-                            that.gettpl(1, 0)
+                            that.gettpl(1)
                         } else {
                             that.$message({
                                 type: 'error',
@@ -340,7 +345,7 @@
                         if (res.data.code === 1) {
                             that.formLabelAlignEdit = res.data.data
                             var formLabelAlignEdit = JSON.parse(JSON.stringify(that.formLabelAlignEdit))
-                            that.getSelectNbc(that.formLabelAlignEdit.street_id,formLabelAlignEdit)
+                            that.getSelectNbc(that.formLabelAlignEdit.street_id, formLabelAlignEdit)
                         } else {
                             that.$message({
                                 type: 'error',
@@ -356,7 +361,7 @@
             //选择街道时
             streetChange(id, formLabelAlign) {
                 // formLabelAlign.nbc_id = null
-                this.getSelectNbc(id,formLabelAlign)
+                this.getSelectNbc(id, formLabelAlign)
             },
             //选择居委会时
             nbcChange(val) {
@@ -439,7 +444,7 @@
             },
         },
         mounted() {
-            this.gettpl(1, 0)
+            this.gettpl(1)
             this.getSelect()
         }
     }
@@ -492,7 +497,6 @@
                 }
             }
 
-           
 
             .operation {
                 .el-icon-thumb {
